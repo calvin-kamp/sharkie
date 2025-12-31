@@ -1,21 +1,26 @@
 <!DOCTYPE html>
 <html lang="en" translate="no">
-    <head>
-        <meta charset="UTF-8" />
-        <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        <title>Sharkie</title>
-    </head>
-    <body>
-        <header class="header"></header>
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        <main>
-            <canvas data-component="canvas" width="720" height="480"></canvas>
-        </main>
+    <link rel="preload" href="/src/assets/fonts/avenir-next-regular.woff2" as="font" type="font/woff2" crossorigin />
 
-        <footer class="footer"></footer>
+    <title>Sharkie</title>
+</head>
 
-        <script type="module" src="/src/game.ts"></script>
-    </body>
+<body>
+    <header class="header"></header>
+
+    <main>
+        <canvas data-component="canvas" width="720" height="480"></canvas>
+    </main>
+
+    <footer class="footer"></footer>
+
+    <script type="module" src="/src/game.ts"></script>
+</body>
+
 </html>

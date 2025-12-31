@@ -27,6 +27,8 @@
         "paths": {
             "@root/*": ["./src/*"],
             "@styles/*": ["./src/styles/*"],
+            "@assets/*": ["./src/assets/*"],
+            "@models/*": ["./src/models/*"],
             "@scripts/*": ["./src/scripts/*"]
         }
     },
