@@ -257,21 +257,21 @@
                 "preview": "sprites/enemies/pufferfish/pufferfish-preview.gif"
             },
             "jellyfish": {
-                "regular-damage": {
+                "regular": {
                     "purple": {
                         "frames": [
-                            "sprites/enemies/jellyfish/regular-damage/purple/regular-damage-purple-1.png",
-                            "sprites/enemies/jellyfish/regular-damage/purple/regular-damage-purple-2.png",
-                            "sprites/enemies/jellyfish/regular-damage/purple/regular-damage-purple-3.png",
-                            "sprites/enemies/jellyfish/regular-damage/purple/regular-damage-purple-4.png"
+                            "sprites/enemies/jellyfish/regular/purple/regular-purple-1.png",
+                            "sprites/enemies/jellyfish/regular/purple/regular-purple-2.png",
+                            "sprites/enemies/jellyfish/regular/purple/regular-purple-3.png",
+                            "sprites/enemies/jellyfish/regular/purple/regular-purple-4.png"
                         ]
                     },
                     "yellow": {
                         "frames": [
-                            "sprites/enemies/jellyfish/regular-damage/yellow/regular-damage-yellow-1.png",
-                            "sprites/enemies/jellyfish/regular-damage/yellow/regular-damage-yellow-2.png",
-                            "sprites/enemies/jellyfish/regular-damage/yellow/regular-damage-yellow-3.png",
-                            "sprites/enemies/jellyfish/regular-damage/yellow/regular-damage-yellow-4.png"
+                            "sprites/enemies/jellyfish/regular/yellow/regular-yellow-1.png",
+                            "sprites/enemies/jellyfish/regular/yellow/regular-yellow-2.png",
+                            "sprites/enemies/jellyfish/regular/yellow/regular-yellow-3.png",
+                            "sprites/enemies/jellyfish/regular/yellow/regular-yellow-4.png"
                         ]
                     }
                 },
