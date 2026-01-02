@@ -1,4 +1,3 @@
-// assets.ts
 export const getGameAssetUrl = (path: string): string =>
     new URL(`game/${path}`, window.location.href).toString()
 
@@ -66,5 +65,6 @@ export const assets = {
             bar: (fileName: string, color: string, type: string) =>
                 getGameAssetUrl(`misc/hud/bars/${color}/${type}/${fileName}`),
         },
-    },
+    }
+
 } as const
