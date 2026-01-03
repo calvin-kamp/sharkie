@@ -15,7 +15,24 @@ export class World {
 
     lights = [
         new Light({
+            imageSrc: assets.backgrounds.layer('light-1.png', 'light'),
+            x: -180,
+            width: 720
+        }),
+        new Light({
             imageSrc: assets.backgrounds.layer('light-2.png', 'light'),
+            x: 540,
+            width: 720
+        }),
+        new Light({
+            imageSrc: assets.backgrounds.layer('light-1.png', 'light'),
+            x: 1260,
+            width: 720
+        }),
+        new Light({
+            imageSrc: assets.backgrounds.layer('light-2.png', 'light'),
+            x: 1980,
+            width: 720
         }),
     ]
 
