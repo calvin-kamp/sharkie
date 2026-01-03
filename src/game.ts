@@ -1,4 +1,5 @@
 import { World } from '@models/world.model'
+import { levelOne } from '@root/levels/level-one'
 import '@styles/styles.scss'
 
 const component = '*[data-component=canvas]'
@@ -10,7 +11,7 @@ const init = () => {
         return
     }
 
-    const world = new World($canvas)
+    const world = new World($canvas, levelOne)
 
     world.draw()
 }
