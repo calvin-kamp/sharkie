@@ -57,6 +57,7 @@ export const assets = {
 
         hud: {
             coin: (fileName: string) => getGameAssetUrl(`misc/hud/coin/${fileName}`),
+
             poison: (fileName: string, animated = false) =>
                 animated
                     ? getGameAssetUrl(`misc/hud/poison/animated/${fileName}`)
@@ -65,6 +66,5 @@ export const assets = {
             bar: (fileName: string, color: string, type: string) =>
                 getGameAssetUrl(`misc/hud/bars/${color}/${type}/${fileName}`),
         },
-    }
-
+    },
 } as const
