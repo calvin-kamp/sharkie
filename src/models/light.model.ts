@@ -1,7 +1,7 @@
-import { MovableObject, type MovableObjectConfig } from '@models/movable-object.model'
+import { DrawableObject, type DrawableObjectConfig } from '@models/drawable-object.model'
 
-export class Light extends MovableObject {
-    constructor(config: MovableObjectConfig) {
+export class Light extends DrawableObject {
+    constructor(config: DrawableObjectConfig) {
         super({
             imageSrc: config.imageSrc,
             x: config.x ?? 50,
