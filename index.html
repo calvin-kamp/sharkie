@@ -1,26 +1,347 @@
 <!DOCTYPE html>
 <html lang="en" translate="no">
-
 <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <link rel="preload" href="/src/assets/fonts/avenir-next-regular.woff2" as="font" type="font/woff2" crossorigin />
-
+    <link rel="stylesheet" href="./assets/fonts/fonts.css">
     <title>Sharkie</title>
 </head>
 
 <body>
-    <header class="header"></header>
-
     <main>
-        <canvas data-component="canvas" width="720" height="480"></canvas>
-    </main>
+        <section class="game">
+            <div class="rotate-hint" role="status" aria-live="polite">
+                <img class="rotate-hint__image" src="/assets/rotate-your-device.png" alt="Please turn your device" />
+                
+                <p class="rotate-hint__text">
+                    rotate your screen
+                </p>
+            </div>
 
-    <footer class="footer"></footer>
+            <div class="game__stage">
+                <canvas class="game__canvas" data-component="canvas" width="720" height="480"></canvas>
+
+                <div class="menu" data-menu>
+                    <div class="menu__screen is-active" data-screen="main">
+                        <div class="menu__stack">
+                            <button class="menu__button button button--primary" data-action="open-difficulty">
+                                start
+                            </button>
+
+                            <button class="menu__button button button--secondary" data-action="open-controls">
+                                control
+                            </button>
+
+                            <button class="menu__button button button--secondary" data-action="open-description">
+                                description
+                            </button>
+
+                            <button class="menu__button button button--secondary" data-action="open-enemies">
+                                enemies
+                            </button>
+
+                            <button class="menu__button button button--secondary" data-action="open-items">
+                                items
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="menu__screen" data-screen="difficulty">
+                        <h2 class="menu__title">
+                            difficulty
+                        </h2>
+
+                        <div class="menu__stack">
+                            <button class="menu__button button button--secondary" data-action="start-game" data-difficulty="easy">
+                                easy
+                            </button>
+
+                            <button class="menu__button button button--secondary" data-action="start-game" data-difficulty="medium">
+                                medium
+                            </button>
+
+                            <button class="menu__button button button--secondary" data-action="start-game" data-difficulty="hard">
+                                hard
+                            </button>
+
+                            <button class="menu__button button button--secondary" data-action="start-game" data-difficulty="impossible">
+                                impossible
+                            </button>
+
+                            <button class="menu__button button button--primary" data-action="back-main">
+                                back
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="menu__screen" data-screen="pause">
+                        <h2 class="menu__title">paused</h2>
+                        <div class="menu__stack">
+                            <button class="menu__button button button--primary" data-action="resume">
+                                resume
+                            </button>
+                            
+                            <button class="menu__button button button--secondary" data-action="open-controls" data-from="pause">
+                                control
+                            </button>
+                            
+                            <button class="menu__button button button--secondary" data-action="main-menu">
+                                main menu
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="menu__screen" data-screen="controls">
+                        <h2 class="menu__title">control</h2>
+
+                        <div class="menu__grid">
+                            <div class="menu__panel">
+                                <h3 class="menu__subtitle">
+                                    move
+                                </h3>
+                                
+                                <ul class="menu__list">
+                                    <li>
+                                        <span class="menu__key">
+                                            w
+                                        </span>
+                                        
+                                        / 
+                                        
+                                        <span class="menu__key">
+                                            ↑
+                                        </span>
+
+                                        move up
+                                    </li>
+
+                                    <li>
+                                        <span class="menu__key">
+                                            a
+                                        </span>
+                                        
+                                        / 
+                                        
+                                        <span class="menu__key">
+                                            ←
+                                        </span>
+
+                                        move left
+                                    </li>
+
+                                    <li>
+                                        <span class="menu__key">
+                                            s
+                                        </span>
+                                        
+                                        / 
+                                        
+                                        <span class="menu__key">
+                                            ↓
+                                        </span>
+
+                                        move down
+                                    </li>
+
+                                    <li>
+                                        <span class="menu__key">
+                                            d
+                                        </span>
+
+                                        /
+                                        
+                                        <span class="menu__key">
+                                            →
+                                        </span>
+                                        
+                                        move right
+                                    </li>
+
+                                    <li>
+                                        <span class="menu__key">
+                                            esc
+                                        </span>
+
+                                        pause / menu
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="menu__panel">
+                                <h3 class="menu__subtitle">
+                                    attack
+                                </h3>
+
+                                <ul class="menu__list">
+                                    <li>
+                                        <span class="menu__key">
+                                            e
+                                        </span>
+                                        
+                                        bubble trap
+                                    </li>
+
+                                    <li>
+                                        <span class="menu__key">
+                                            q
+                                        </span>
+                                        
+                                        bubble trap poisoned
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <button class="menu__button button button--primary" data-action="back">
+                            back
+                        </button>
+                    </div>
+
+                    <div class="menu__screen" data-screen="description">
+                        <h2 class="menu__title">
+                            description
+                        </h2>
+
+                        <div class="menu__text">
+                            Swim through the sea, collect coins and poison potions, and defeat the boss.
+                            <br />
+                            Poisoned bubbles are only available if you collected poison.
+                        </div>
+
+                        <button class="menu__button button button--primary" data-action="back">
+                            back
+                        </button>
+                    </div>
+
+                    <div class="menu__screen" data-screen="enemies">
+                        <h2 class="menu__title">
+                            enemies
+                        </h2>
+
+                        <div class="menu__enemy-row">
+                            <div class="menu__enemy">
+                                <img class="menu__enemy-img" src="/game/sprites/enemies/pufferfish/swim/orange/orange-swim-1.png" alt="pufferfish" />
+                                
+                                <p class="menu__enemy-name">
+                                    pufferfish
+                                </p>
+                            </div>
+
+                            <div class="menu__enemy">
+                                <img class="menu__enemy-img" src="/game/sprites/enemies/jellyfish/regular/purple/regular-purple-1.png" alt="jellyfish" />
+                                
+                                <p class="menu__enemy-name">
+                                    jellyfish
+                                </p>
+                            </div>
+
+                            <div class="menu__enemy">
+                                <img class="menu__enemy-img" src="/game/sprites/enemies/boss/floating/boss-floating-1.png" alt="boss" />
+                                
+                                <p class="menu__enemy-name">
+                                    boss
+                                </p>
+                            </div>
+                        </div>
+
+                        <button class="menu__button button button--primary" data-action="back">
+                            back
+                        </button>
+                    </div>
+
+                    <div class="menu__screen" data-screen="items">
+                        <h2 class="menu__title">
+                            items
+                        </h2>
+
+                        <div class="menu__items">
+                            <div class="menu__item">
+                                <img class="menu__item-img" src="/game/misc/hud/coin/coin-1.png" alt="coin" />
+                                
+                                <div class="menu__item-body">
+                                    <h3 class="menu__item-title">
+                                        gold coin
+                                    </h3>
+
+                                    <p class="menu__item-text">
+                                        shiny, round, and great for looking rich.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="menu__item">
+                                <img class="menu__item-img" src="/game/misc/hud/poison/animated/poison-animated-1.png" alt="poison" />
+                                
+                                <div class="menu__item-body">
+                                    <h3 class="menu__item-title">
+                                        poison potion
+                                    </h3>
+
+                                    <p class="menu__item-text">
+                                        unlocks poisoned bubbles (q).
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button class="menu__button button button--primary" data-action="back">
+                            back
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mobile-controls is-hidden" data-mobile-controls>
+                    <div class="mobile-controls__left">
+                        <div class="mobile-controls__panel mobile-controls__panel--left">
+                            <button class="mobile-controls__button mobile-controls__button--up" data-key="ArrowUp" aria-label="Move up">
+                                <span class="mobile-controls__icon">
+                                    ↑
+                                </span>
+                            </button>
+
+                            <div class="mobile-controls__row" aria-label="Move">
+                                <button class="mobile-controls__button" data-key="ArrowLeft" aria-label="Move left">
+                                    <span class="mobile-controls__icon">
+                                        ←
+                                    </span>
+                                </button>
+                                
+                                <button class="mobile-controls__button" data-key="ArrowDown" aria-label="Move down">
+                                    <span class="mobile-controls__icon">
+                                        ↓
+                                    </span>
+                                </button>
+                                
+                                <button class="mobile-controls__button" data-key="ArrowRight" aria-label="Move right">
+                                    <span class="mobile-controls__icon">
+                                        →
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mobile-controls__right">
+                        <div class="mobile-controls__panel mobile-controls__panel--right">
+                            <button class="mobile-controls__button mobile-controls__button--action mobile-controls__button--poison" data-key="q" aria-label="Poisoned bubble trap (Q)">
+                                <span class="mobile-controls__icon">
+                                    <img src="./game/sprites/player/attack/bubble-trap/bubble-poisoned.png" alt="Bubble Attack Poisoned">
+                                </span>
+                            </button>
+                            
+                            <button class="mobile-controls__button mobile-controls__button--action" data-key="e" aria-label="Bubble trap (E)">
+                                <span class="mobile-controls__icon">
+                                    <img src="./game/sprites/player/attack/bubble-trap/bubble.png" alt="Bubble Attack">
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
 
     <script type="module" src="/src/game.ts"></script>
 </body>
-
 </html>
