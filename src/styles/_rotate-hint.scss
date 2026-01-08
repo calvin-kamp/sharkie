@@ -1,0 +1,36 @@
+.rotate-hint {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: var(--color-white);
+    text-align: center;
+    user-select: none;
+    z-index: 9999;
+
+    &__image {
+        display: block;
+        width: 100%;
+        max-width: 480px;
+        height: auto;
+    }
+
+    &__text {
+        margin: 16px 0 0;
+        color: var(--color-bg);
+        font-family: Arial, sans-serif;
+        font-weight: 700;
+        font-size: 16px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    @media (max-width: 1279px) and (orientation: landscape) {
+        display: none;
+    }
+
+    @media (min-width: 1280px) {
+        display: none;
+    }
+}
