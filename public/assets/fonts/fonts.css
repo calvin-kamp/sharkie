@@ -1,0 +1,13 @@
+/* luckiest-guy-regular - latin */
+@font-face {
+    font-display: swap;
+    font-family: 'Luckiest Guy';
+    font-style: normal;
+    font-weight: 400;
+    src: url('./luckiest-guy-v25-latin-regular.eot');
+    src: url('./luckiest-guy-v25-latin-regular.eot?#iefix') format('embedded-opentype'),
+        url('./luckiest-guy-v25-latin-regular.woff2') format('woff2'),
+        url('./luckiest-guy-v25-latin-regular.woff') format('woff'),
+        url('./luckiest-guy-v25-latin-regular.ttf') format('truetype'),
+        url('./luckiest-guy-v25-latin-regular.svg#LuckiestGuy') format('svg');
+}
