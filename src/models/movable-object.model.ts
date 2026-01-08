@@ -1,46 +1,59 @@
-export interface MovableObjectConfig {
-    imageSrc: string
-    x?: number
-    y?: number
+import { DrawableObject, type DrawableObjectConfig } from '@models/drawable-object.model'
+
+export interface HitboxConfig {
+    offsetX?: number
+    offsetY?: number
     width?: number
     height?: number
-    aspectRatio?: number
 }
 
-export class MovableObject {
-    x: number
-    y: number
-    width: number
-    height?: number
-    private aspectRatio: number
-    img: HTMLImageElement
+export interface MovableObjectConfig extends DrawableObjectConfig {
+    hitbox?: HitboxConfig
+}
+
+export class MovableObject extends DrawableObject {
     directionLeft: boolean = false
-    cachedImages: HTMLImageElement[] = []
+
+    private hitbox: { offsetX: number; offsetY: number; width: number; height: number }
 
     constructor(config: MovableObjectConfig) {
-        this.img = new Image()
+        super(config)
 
-        this.x = config.x ?? 0
-        this.y = config.y ?? 0
-
-        this.aspectRatio = config.aspectRatio ?? 2 / 3
-
-        this.width = config.width ?? 100
-        this.height = config.height ?? undefined
-
-        this.loadImage(config.imageSrc)
+        this.hitbox = {
+            offsetX: config.hitbox?.offsetX ?? 0,
+            offsetY: config.hitbox?.offsetY ?? 0,
+            width: config.hitbox?.width ?? this.width,
+            height: config.hitbox?.height ?? this.calculatedHeight,
+        }
     }
 
-    private loadImage(imagePath: string) {
-        this.img.src = imagePath
+    protected loadImage(imagePath: string) {
+        super.loadImage(imagePath)
     }
 
     cacheImages(images: string[]) {
-        for(const imageSrc of images) {
-            const img = new Image()
-            img.src = imageSrc
+        super.cacheImages(images)
+    }
 
-            this.cachedImages.push(img)
+    setHitbox(hitbox: HitboxConfig) {
+        this.hitbox = {
+            offsetX: hitbox.offsetX ?? this.hitbox.offsetX,
+            offsetY: hitbox.offsetY ?? this.hitbox.offsetY,
+            width: hitbox.width ?? this.hitbox.width,
+            height: hitbox.height ?? this.hitbox.height,
+        }
+    }
+
+    getHitbox() {
+        const mirroredOffsetX = this.directionLeft
+            ? this.width - this.hitbox.offsetX - this.hitbox.width
+            : this.hitbox.offsetX
+
+        return {
+            x: this.x + mirroredOffsetX,
+            y: this.y + this.hitbox.offsetY,
+            width: this.hitbox.width,
+            height: this.hitbox.height,
         }
     }
 
@@ -58,11 +71,5 @@ export class MovableObject {
 
     moveRight() {
         this.x += 2.5
-    }
-
-    get calculatedHeight() {
-
-        return this.height || Math.floor(this.width * this.aspectRatio)
-
     }
 }
