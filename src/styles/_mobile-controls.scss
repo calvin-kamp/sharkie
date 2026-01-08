@@ -1,0 +1,149 @@
+
+.mobile-controls {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+
+    &.is-hidden {
+        display: none;
+    }
+
+    @media (hover: none) and (pointer: coarse) {
+        display: block;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+        display: none;
+    }
+
+    &__left,
+    &__right {
+        position: absolute;
+        bottom: 4px;
+        pointer-events: none;
+    }
+
+    &__left {
+        left: 4px;
+    }
+
+    &__right {
+        right: 4px;
+    }
+
+    &__panel {
+        pointer-events: auto;
+        display: grid;
+        gap: 4px;
+        padding: 8px;
+        border-radius: 26px;
+        background: rgba(59, 20, 103, 0.35);
+        border: 2px solid rgba(255, 255, 255, 0.35);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        user-select: none;
+        touch-action: none;
+    }
+
+    &__panel--left {
+        width: 180px;
+        align-content: start;
+        justify-items: center;
+    }
+
+    &__panel--right {
+        grid-auto-flow: column;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        padding: 12px 12px;
+    }
+
+    &__row {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        width: 100%;
+        border-radius: 22px;
+    }
+
+    &__button {
+        width: 44px;
+        height: 44px;
+        display: grid;
+        place-items: center;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.10);
+        border: 2px solid rgba(255, 255, 255, 0.55);
+        color: rgba(255, 255, 255, 0.92);
+        font-size: 22px;
+        line-height: 1;
+        padding: 0;
+        cursor: pointer;
+        touch-action: none;
+
+        &:active {
+            transform: translateY(1px) scale(0.98);
+            background: rgba(255, 255, 255, 0.22);
+            border-color: rgba(255, 255, 255, 0.85);
+        }
+    }
+
+    &__button--up {
+        font-size: 26px;
+    }
+
+    &__button--action {
+        width: 44px;
+        height: 44px;
+        font-size: 26px;
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.45);
+    }
+
+    &__button--poison {
+        background: rgba(0, 255, 170, 0.16);
+        border-color: rgba(0, 255, 170, 0.65);
+
+        &:active {
+            background: rgba(0, 255, 170, 0.30);
+            border-color: rgba(0, 255, 170, 0.85);
+        }
+    }
+
+    &__icon {
+        transform: translateY(-1px);
+        
+        &:has(img) {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: translateY(0);
+        }
+
+        img {
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 620px) {
+        &__panel--left {
+            width: 168px;
+            padding: 10px;
+        }
+
+        &__button {
+            width: 48px;
+            height: 48px;
+            font-size: 20px;
+        }
+
+        &__button--up,
+        &__button--action {
+            width: 66px;
+            height: 66px;
+            font-size: 24px;
+        }
+    }
+}
