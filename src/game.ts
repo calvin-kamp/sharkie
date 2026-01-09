@@ -33,6 +33,7 @@ const game = {
     world: null as World | null,
     isPaused: false,
     lastNonPauseScreen: 'main' as Screen,
+    lastDifficulty: null as Difficulty | null,
     mobileControls: null as MobileControls | null,
 
     /**
@@ -132,7 +133,10 @@ const game = {
             }
 
             if (action === 'main-menu') {
-                window.location.reload()
+                this.destroyWorld()
+                this.showMenu($menu)
+                this.showScreen($menu, 'main')
+                this.mobileControls?.hide()
             
                 return
             }
@@ -178,13 +182,12 @@ const game = {
      */
     startGame($canvas: HTMLCanvasElement, $menu: HTMLElement, difficulty: Difficulty) {
         if (this.world) {
-            window.location.reload()
-            
-            return
+            this.destroyWorld()
         }
 
+        this.lastDifficulty = difficulty
         const level = createLevel(difficulty)
-        this.world = new World($canvas, level)
+        this.world = new World($canvas, level, () => this.finishToMainMenu($menu))
         this.world.draw()
 
         this.isPaused = false
@@ -225,6 +228,23 @@ const game = {
         this.hideMenu($menu)
 
         this.mobileControls?.show()
+    },
+
+    destroyWorld() {
+        if (!this.world) {
+            return
+        }
+
+        this.world.destroy()
+        this.world = null
+        this.isPaused = false
+    },
+
+    finishToMainMenu($menu: HTMLElement) {
+        this.destroyWorld()
+        this.showMenu($menu)
+        this.showScreen($menu, 'main')
+        this.mobileControls?.hide()
     },
 
     /**

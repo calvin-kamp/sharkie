@@ -55,26 +55,40 @@ export const drawEndScreen = (
 }
 
 /**
- * Binds event handlers for restarting the game after win/lose
+ * Binds event handlers for finishing the game after win/lose
  * @param {HTMLCanvasElement} canvas - The game canvas element
  * @param {Function} getEndState - Function that returns the current end state
+ * @param {() => void} onFinish - Callback invoked when user confirms end screen
+ * @returns {() => void} Cleanup function to remove handlers
  */
-export const bindRestartHandlers = (canvas: HTMLCanvasElement, getEndState: () => EndState): void => {
-    canvas.addEventListener('click', () => {
+export const bindRestartHandlers = (
+    canvas: HTMLCanvasElement,
+    getEndState: () => EndState,
+    onFinish: () => void
+): (() => void) => {
+    const onClick = () => {
         if (getEndState() === 'none') {
             return
         }
 
-        window.location.reload()
-    })
+        onFinish()
+    }
 
-    document.addEventListener('keydown', (e) => {
+    const onKey = (e: KeyboardEvent) => {
         if (getEndState() === 'none') {
             return
         }
 
         if (e.key === 'Enter' || e.key === ' ' || e.key === 'r' || e.key === 'R') {
-            window.location.reload()
+            onFinish()
         }
-    })
+    }
+
+    canvas.addEventListener('click', onClick)
+    document.addEventListener('keydown', onKey)
+
+    return () => {
+        canvas.removeEventListener('click', onClick)
+        document.removeEventListener('keydown', onKey)
+    }
 }
