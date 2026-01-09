@@ -1,8 +1,29 @@
+/**
+ * @fileoverview Boss enemy model for the final boss encounter.
+ * Manages boss behavior, attack patterns, animations, and combat mechanics.
+ */
+
 import { MovableObject, type MovableObjectConfig, type HitboxConfig } from '@models/movable-object.model'
 import type { CombatConfig } from '@models/combat.model'
 import type { Player } from '@models/player.model'
 import { clamp } from '@root/utils/geometry'
 
+/**
+ * Configuration for creating the boss
+ * @typedef {Object} BossConfig
+ * @property {string[]} imagesIntroduce - Introduction animation frames
+ * @property {string[]} imagesFloating - Idle floating animation frames
+ * @property {string[]} imagesAttack - Attack animation frames
+ * @property {string[]} imagesDead - Death animation frames
+ * @property {string[]} imagesHurt - Hurt animation frames
+ * @property {number} [x] - X position on canvas
+ * @property {number} [y] - Y position on canvas
+ * @property {number} [width] - Width in pixels
+ * @property {number} [height] - Height in pixels
+ * @property {number} [aspectRatio] - Width to height ratio
+ * @property {HitboxConfig} [hitbox] - Collision hitbox configuration
+ * @property {CombatConfig} [combat] - Combat stats configuration
+ */
 export interface BossConfig {
     imagesIntroduce: string[]
     imagesFloating: string[]
@@ -20,6 +41,9 @@ export interface BossConfig {
     combat?: CombatConfig
 }
 
+/**
+ * Boss class representing the final boss enemy with complex AI and attack patterns
+ */
 export class Boss extends MovableObject {
     private introduced = false
     private introducing = false

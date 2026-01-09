@@ -1,7 +1,23 @@
+/**
+ * @fileoverview Helper utility functions for random numbers and asset URL generation.
+ * Provides URL builders for different asset types organized by game category.
+ */
+
+/**
+ * Generates a random integer between min and max (inclusive)
+ * @param {number} min - Minimum value
+ * @param {number} max - Maximum value
+ * @returns {number} Random integer between min and max
+ */
 export const getRandomNumber = (min: number, max: number): number => {
     return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
+/**
+ * Constructs absolute game asset URL from a relative path
+ * @param {string} path - Relative path to the asset
+ * @returns {string} Absolute URL to the game asset
+ */
 export const getGameAssetUrl = (path: string): string => {
     return new URL(`game/${path}`, window.location.href).toString()
 }
@@ -10,6 +26,11 @@ export const getGameAssetUrl = (path: string): string => {
 /* sprites                                                                     */
 /* -------------------------------------------------------------------------- */
 
+/**
+ * Constructs URL for sprite assets
+ * @param {string} path - Relative path to the sprite
+ * @returns {string} URL to the sprite asset
+ */
 export const getSpriteAssetUrl = (path: string): string => {
     const completePath = `/sprites/${path}`
     return getGameAssetUrl(completePath)

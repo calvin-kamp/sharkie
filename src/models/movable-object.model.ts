@@ -1,5 +1,18 @@
+/**
+ * @fileoverview Movable object model extending drawable objects with hitbox support.
+ * Provides collision detection capabilities and movement-related functionality.
+ */
+
 import { DrawableObject, type DrawableObjectConfig } from '@models/drawable-object.model'
 
+/**
+ * Hitbox configuration for collision detection
+ * @typedef {Object} HitboxConfig
+ * @property {number} [offsetX=0] - Horizontal offset from object position
+ * @property {number} [offsetY=0] - Vertical offset from object position
+ * @property {number} [width] - Hitbox width (defaults to object width)
+ * @property {number} [height] - Hitbox height (defaults to object height)
+ */
 export interface HitboxConfig {
     offsetX?: number
     offsetY?: number
@@ -7,10 +20,19 @@ export interface HitboxConfig {
     height?: number
 }
 
+/**
+ * Configuration for movable objects, extending drawable object config
+ * @typedef {Object} MovableObjectConfig
+ * @property {HitboxConfig} [hitbox] - Collision hitbox configuration
+ */
 export interface MovableObjectConfig extends DrawableObjectConfig {
     hitbox?: HitboxConfig
 }
 
+/**
+ * Base class for all movable game objects with collision detection
+ * Extends DrawableObject with hitbox and direction management
+ */
 export class MovableObject extends DrawableObject {
     directionLeft: boolean = false
 

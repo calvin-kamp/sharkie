@@ -1,8 +1,16 @@
+/**
+ * @fileoverview Collision detection and management system.
+ * Handles detection and response for player collisions with enemies and boss.
+ */
+
 import type { Player } from '@models/player.model'
 import type { Enemy } from '@models/enemy.model'
 import type { Boss } from '@models/boss.model'
 import { isColliding } from '@root/utils/geometry'
 
+/**
+ * Collision manager handling player collisions with enemies and boss
+ */
 export class CollisionManager {
     private collidingEnemies = new Set<Enemy>()
     private collidingBoss = false

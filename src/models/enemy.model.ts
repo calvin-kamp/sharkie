@@ -1,18 +1,48 @@
+/**
+ * @fileoverview Enemy character model for game enemies.
+ * Manages enemies (jellyfish, pufferfish) behavior, movement, animations, and combat.
+ */
+
 import { MovableObject, type MovableObjectConfig } from '@models/movable-object.model'
 import { getRandomNumber } from '@root/utils/helper'
 import { assets } from '@root/utils/assets'
 
+/**
+ * Enemy types in the game
+ * @typedef {'pufferfish' | 'jellyfish' | 'boss'} EnemyType
+ */
 export type EnemyType = 'pufferfish' | 'jellyfish' | 'boss'
+
+/**
+ * Enemy animation/behavior states
+ * @typedef {'swim' | 'hurt' | 'dead'} EnemyState
+ */
 type EnemyState = 'swim' | 'hurt' | 'dead'
 
+/**
+ * Configuration options for enemy combat stats
+ * @typedef {Object} EnemyOptions
+ * @property {number} [maxHp] - Maximum health points
+ * @property {number} [hp] - Initial health points
+ * @property {number} [damage] - Damage output per hit
+ */
 export interface EnemyOptions {
+    /** Maximum health points */
     maxHp?: number
+    /** Initial health points */
     hp?: number
+    /** Damage output per hit */
     damage?: number
 }
 
+/**
+ * Type definition for enemy initialization, excluding imageSrc
+ */
 type EnemyInit = Omit<MovableObjectConfig, 'imageSrc'>
 
+/**
+ * Enemy class representing game enemies with AI and combat
+ */
 export class Enemy extends MovableObject {
     readonly type: EnemyType
     private state: EnemyState = 'swim'

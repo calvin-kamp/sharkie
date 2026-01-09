@@ -1,5 +1,21 @@
+/**
+ * @fileoverview End game screen rendering and restart handling.
+ * Displays win/lose screens and handles game restart input.
+ */
+
+/**
+ * Game end states
+ * @typedef {'none' | 'win' | 'lose'} EndState
+ */
 export type EndState = 'none' | 'win' | 'lose'
 
+/**
+ * Draws the end game screen with appropriate title and instructions
+ * @param {CanvasRenderingContext2D} ctx - Canvas 2D context
+ * @param {number} canvasWidth - Canvas width in pixels
+ * @param {number} canvasHeight - Canvas height in pixels
+ * @param {EndState} endState - Current end game state
+ */
 export const drawEndScreen = (
     ctx: CanvasRenderingContext2D,
     canvasWidth: number,

@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Game level model containing all game entities and configuration.
+ * Manages player, enemies, collectibles, and level-specific settings.
+ */
+
 import { Player } from '@models/player.model'
 import { Light } from '@models/light.model'
 import { Background } from '@models/background.model'
@@ -11,13 +16,27 @@ import { StatusBar } from '@models/status-bar.model'
 import { HudCounter } from '@models/hud-counter.model'
 import type { Collectible } from '@models/collectible.model'
 
+/**
+ * Game difficulty levels with different stat multipliers
+ * @typedef {'easy' | 'medium' | 'hard' | 'impossible'} Difficulty
+ */
 export type Difficulty = 'easy' | 'medium' | 'hard' | 'impossible'
 
+/**
+ * Level configuration options
+ * @typedef {Object} LevelOptions
+ * @property {Difficulty} [difficulty='medium'] - The game difficulty
+ * @property {CombatConfig} [playerCombat] - Custom player combat stats
+ */
 type LevelOptions = {
     difficulty?: Difficulty
     playerCombat?: CombatConfig
 }
 
+/**
+ * Game level class containing all entities and configuration
+ * Manages the complete game level setup including player, enemies, and environment
+ */
 export class Level {
     player = new Player({
         imageSrc: assets.player.state('idle-1.png', 'idle'),

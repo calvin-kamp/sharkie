@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Game world model managing all game entities and logic.
+ * Orchestrates rendering, updates, and interactions between all game objects including
+ * player, enemies, boss, projectiles, and collectibles.
+ */
+
 import { MovableObject } from '@models/movable-object.model'
 import type { Player } from '@models/player.model'
 import type { Boss } from '@models/boss.model'
@@ -17,6 +23,9 @@ import { StatusBar } from '@models/status-bar.model'
 import type { HudCounter } from '@models/hud-counter.model'
 import type { Collectible } from '@models/collectible.model'
 
+/**
+ * Type definition for level-like objects containing game entities
+ */
 type LevelLike = {
     player: Player
     lights: MovableObject[]
@@ -29,6 +38,10 @@ type LevelLike = {
     collectibles?: Collectible[]
 }
 
+/**
+ * Main game world class orchestrating all game logic and rendering
+ * Manages player, enemies, boss, camera, collision detection, and game state
+ */
 export class World {
     player: Player
     lights: MovableObject[]

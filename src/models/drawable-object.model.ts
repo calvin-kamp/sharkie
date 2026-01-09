@@ -1,3 +1,18 @@
+/**
+ * @fileoverview Base drawable object model for all renderable game entities.
+ * Provides image caching, position/size management, and rendering capabilities.
+ */
+
+/**
+ * Configuration object for creating a drawable object
+ * @typedef {Object} DrawableObjectConfig
+ * @property {string} imageSrc - Path to the image source
+ * @property {number} [x=0] - X position on canvas
+ * @property {number} [y=0] - Y position on canvas
+ * @property {number} [width=100] - Width in pixels
+ * @property {number} [height] - Height in pixels (if not set, calculated from aspectRatio)
+ * @property {number} [aspectRatio] - Width to height ratio (default: 2/3)
+ */
 export interface DrawableObjectConfig {
     imageSrc: string
     x?: number
@@ -8,6 +23,10 @@ export interface DrawableObjectConfig {
     aspectRatio?: number
 }
 
+/**
+ * Base class for all drawable game objects
+ * Manages image loading, caching, positioning, and rendering
+ */
 export class DrawableObject {
     private static imageCache = new Map<string, HTMLImageElement>()
 

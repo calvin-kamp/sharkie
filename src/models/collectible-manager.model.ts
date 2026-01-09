@@ -1,7 +1,15 @@
+/**
+ * @fileoverview Collectible items management system.
+ * Handles collectible item updates, collision detection, and collection logic.
+ */
+
 import type { Player } from '@models/player.model'
 import type { Collectible } from '@models/collectible.model'
 import { isColliding } from '@root/utils/geometry'
 
+/**
+ * Collectible manager handling item collection and updates
+ */
 export class CollectibleManager {
     private collectibles: Collectible[] = []
 

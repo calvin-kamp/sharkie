@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Level creation and configuration module.
+ * Contains factory functions and configuration for creating game levels with appropriate
+ * enemies, collectibles, and difficulty-based stats.
+ */
+
 import { Level, type Difficulty } from '@models/level.model'
 import { Enemy } from '@models/enemy.model'
 import { Boss } from '@models/boss.model'

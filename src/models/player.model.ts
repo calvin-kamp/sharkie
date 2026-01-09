@@ -1,30 +1,62 @@
+/**
+ * @fileoverview Player character model for the main playable character.
+ * Manages player movement, animations, combat mechanics, collectibles, and state.
+ */
+
 import { MovableObject, type MovableObjectConfig } from '@models/movable-object.model'
 import { assets } from '@root/utils/assets'
 import type { CombatConfig } from '@models/combat.model'
 import type { World } from '@models/world.model'
 
+/**
+ * Hurt animation variants
+ * @typedef {'electric-shock' | 'poisoned'} HurtVariant
+ */
 type HurtVariant = 'electric-shock' | 'poisoned'
+
+/**
+ * Attack animation variants
+ * @typedef {'fin-slap' | 'bubble-trap' | 'bubble-trap-poisoned' | 'bubble-trap-no-bubble'} AttackVariant
+ */
 type AttackVariant =
     | 'fin-slap'
     | 'bubble-trap'
     | 'bubble-trap-poisoned'
     | 'bubble-trap-no-bubble'
 
+/**
+ * Player animation states
+ * @typedef {'swim' | 'idle' | 'idleLong' | 'hurt' | 'attack' | 'dead'} PlayerState
+ */
 type PlayerState = 'swim' | 'idle' | 'idleLong' | 'hurt' | 'attack' | 'dead'
 
+/**
+ * Player class representing the main playable character (Sharkie the shark).
+ * Manages movement, animations, combat, collectibles, and world interactions.
+ */
 export class Player extends MovableObject {
+    /** Reference to the world/game state */
     world: World | null = null
 
+    /** Base maximum health points before modifications */
     baseMaxHp: number
+    /** Base damage output before modifications */
     baseDamage: number
+    /** Current maximum health points */
     maxHp: number
+    /** Current health points */
     hp: number
+    /** Current damage output */
     damage: number
 
+    /** Number of coins collected */
     coins = 0
+    /** Maximum coins that can be held */
     maxCoins = 999
 
+    /** Number of poison bottles collected */
     poisonBottles = 0
+    /** Maximum poison bottles that can be held */
     maxPoisonBottles = 5
 
     private rightKeyPressed = false

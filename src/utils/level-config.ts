@@ -1,5 +1,23 @@
+/**
+ * @fileoverview Level configuration with difficulty settings and collectible positions.
+ * Defines game stats for each difficulty level and placement of coins and poison bottles.
+ */
+
 import type { Difficulty } from '@models/level.model'
 
+/**
+ * Combat and health statistics for a difficulty level
+ * @typedef {Object} DifficultyStats
+ * @property {number} playerHp - Player maximum health
+ * @property {number} pufferfishHp - Pufferfish health
+ * @property {number} pufferfishDmg - Pufferfish damage output
+ * @property {number} jellyfishHp - Jellyfish health
+ * @property {number} jellyfishDmg - Jellyfish damage output
+ * @property {number} jellyfishSuperHp - Super jellyfish health
+ * @property {number} jellyfishSuperDmg - Super jellyfish damage output
+ * @property {number} bossHp - Boss health
+ * @property {number} bossDmg - Boss damage output
+ */
 export type DifficultyStats = {
     playerHp: number
     pufferfishHp: number
@@ -12,6 +30,10 @@ export type DifficultyStats = {
     bossDmg: number
 }
 
+/**
+ * Combat stats configuration for each difficulty level
+ * @type {Record<Difficulty, DifficultyStats>}
+ */
 export const DIFFICULTY_STATS: Record<Difficulty, DifficultyStats> = {
     easy: {
         playerHp: 20,

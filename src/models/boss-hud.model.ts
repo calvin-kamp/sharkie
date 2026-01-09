@@ -1,6 +1,14 @@
+/**
+ * @fileoverview Boss HUD management for displaying boss health during battles.
+ * Manages boss health bar rendering and updates during combat encounters.
+ */
+
 import { StatusBar } from '@models/status-bar.model'
 import type { Boss } from '@models/boss.model'
 
+/**
+ * Boss HUD manager displaying boss health bar during combat
+ */
 export class BossHud {
     private bar: StatusBar | null = null
     private readonly displayName: string

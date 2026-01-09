@@ -1,9 +1,17 @@
+/**
+ * @fileoverview Projectile management system for player attack projectiles.
+ * Handles projectile creation, updates, collision detection, and lifecycle management.
+ */
+
 import { Projectile, type ProjectileConfig } from '@models/projectile.model'
 import type { Enemy } from '@models/enemy.model'
 import type { Boss } from '@models/boss.model'
 import { createBubbleProjectile, type ProjectileSpawn } from '@root/utils/projectile-factory'
 import { isColliding } from '@root/utils/geometry'
 
+/**
+ * Projectile manager handling creation, updates, and collision detection
+ */
 export class ProjectileManager {
     private projectiles: Projectile[] = []
     private readonly playerDirectionLeft: () => boolean
