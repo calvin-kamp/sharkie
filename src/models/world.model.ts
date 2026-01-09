@@ -48,6 +48,7 @@ export class World {
     backgrounds: MovableObject[]
     enemies: Enemy[]
     boss: Boss
+    private onFinish?: () => void
 
     readonly canvasWidth: number
     readonly canvasHeight: number
@@ -64,6 +65,7 @@ export class World {
     private projectileManager: ProjectileManager
     private collisionManager: CollisionManager
     private collectibleManager: CollectibleManager
+    private restartCleanup?: () => void
 
     private bossSequenceStarted = false
     private bossVisible = false
@@ -79,10 +81,14 @@ export class World {
 
     private lastFrameAt = 0
     private initialRenderDelay = true
+    private destroyed = false
+    private frameRequestId: number | null = null
 
-    constructor($canvas: HTMLCanvasElement, level: LevelLike) {
+    constructor($canvas: HTMLCanvasElement, level: LevelLike, onFinish?: () => void) {
         this.canvas = $canvas
         this.ctx = $canvas.getContext('2d')
+
+        this.onFinish = onFinish
 
         this.canvasWidth = $canvas.width
         this.canvasHeight = $canvas.height
@@ -109,7 +115,7 @@ export class World {
 
         this.givePlayerWorldProperties()
         this.camera.syncToPlayer(this.player.x, this.player.width)
-        bindRestartHandlers(this.canvas, () => this.endState)
+        this.restartCleanup = bindRestartHandlers(this.canvas, () => this.endState, () => this.onFinish?.())
         
         // Freeze enemies and player initially for 2.5s to allow rendering
         this.freezeEnemies()
@@ -124,6 +130,28 @@ export class World {
                 this.initialRenderDelay = false
             }
         }, 2500)
+    }
+
+    /**
+     * Destroys the world instance, stopping rendering and timers
+     */
+    destroy() {
+        this.destroyed = true
+        this.isPaused = true
+        this.isFrozen = true
+
+        if (this.frameRequestId !== null) {
+            cancelAnimationFrame(this.frameRequestId)
+            this.frameRequestId = null
+        }
+
+        this.freezeEnemies()
+        this.boss.freeze()
+        this.player.disableMovement()
+        this.collectibleManager.freeze()
+        this.playerHud.freeze()
+
+        this.restartCleanup?.()
     }
 
     /**
@@ -438,6 +466,10 @@ export class World {
      * @param {number} [now=performance.now()] - Current timestamp
      */
     draw = (now: number = performance.now()) => {
+        if (this.destroyed) {
+            return
+        }
+
         const dtMs = this.lastFrameAt === 0 ? 0 : now - this.lastFrameAt
         this.lastFrameAt = now
 
@@ -478,7 +510,11 @@ export class World {
             drawEndScreen(this.ctx, this.canvasWidth, this.canvasHeight, this.endState)
         }
 
-        requestAnimationFrame((t) => this.draw(t))
+        if (this.destroyed) {
+            return
+        }
+
+        this.frameRequestId = requestAnimationFrame((t) => this.draw(t))
     }
 
     /**
