@@ -111,10 +111,10 @@ export const createLevel = (difficulty: Difficulty = 'medium') => {
     })
 
     boss.setHitbox({
-        offsetX: Math.round(bossWidth * 0.04),
-        offsetY: Math.round(bossHeight * 0.30),
-        width: Math.round(bossWidth * 0.92),
-        height: Math.round(bossHeight * 0.55),
+        offsetX: Math.round(bossWidth * 0.05),
+        offsetY: Math.round(bossHeight * 0.38),
+        width: Math.round(bossWidth * 0.86),
+        height: Math.round(bossHeight * 0.45),
     })
 
     const collectibles = [
@@ -122,84 +122,27 @@ export const createLevel = (difficulty: Difficulty = 'medium') => {
         ...LEVEL_COLLECTIBLES.poisons.map((p) => createPoison(p.x, p.y)),
     ]
 
+    // Add more collectibles spread across the map
+    const extraCoins = Array.from({ length: 12 }, (_, i) => ({ x: 350 + i * 190, y: 200 + (i % 4) * 60 }))
+    const extraPoisons = Array.from({ length: 6 }, (_, i) => ({ x: 700 + i * 280, y: 350 + (i % 2) * 50 }))
+    collectibles.push(...extraCoins.map((p) => createCoin(p.x, p.y)))
+    collectibles.push(...extraPoisons.map((p) => createPoison(p.x, p.y)))
+
+    // Helper to generate spaced enemies
+    const spawnSpaced = (type: 'jellyfish' | 'pufferfish', count: number, hp: number, dmg: number, startX: number, gap: number) =>
+        Array.from({ length: count }, (_, i) => new Enemy({ x: startX + i * gap }, type, { maxHp: hp, damage: dmg }))
+
+    const enemies = [
+        // Regular jellyfish, more count, spaced out
+        ...spawnSpaced('jellyfish', 4, stats.jellyfishHp, stats.jellyfishDmg, 300, 260),
+        // Pufferfish, more count, spaced out
+        ...spawnSpaced('pufferfish', 6, stats.pufferfishHp, stats.pufferfishDmg, 800, 240),
+        // Super jellyfish
+        ...spawnSpaced('jellyfish', 3, stats.jellyfishSuperHp, stats.jellyfishSuperDmg, 1600, 260),
+    ]
+
     return new Level(
-        [
-            new Enemy(
-                {
-                    imageSrc: assets.enemies.jellyfish('regular-purple-1.png', 'regular', 'purple'),
-                    width: 100,
-                    aspectRatio: 300 / 211,
-                },
-                'jellyfish',
-                {
-                    swim: [
-                        assets.enemies.jellyfish('regular-purple-1.png', 'regular', 'purple'),
-                        assets.enemies.jellyfish('regular-purple-2.png', 'regular', 'purple'),
-                        assets.enemies.jellyfish('regular-purple-3.png', 'regular', 'purple'),
-                        assets.enemies.jellyfish('regular-purple-4.png', 'regular', 'purple'),
-                    ],
-                    dead: [
-                        assets.enemies.jellyfish('dead-purple-1.png', 'dead', 'purple'),
-                        assets.enemies.jellyfish('dead-purple-2.png', 'dead', 'purple'),
-                        assets.enemies.jellyfish('dead-purple-3.png', 'dead', 'purple'),
-                        assets.enemies.jellyfish('dead-purple-4.png', 'dead', 'purple'),
-                    ],
-                },
-                { maxHp: stats.jellyfishHp, damage: stats.jellyfishDmg }
-            ),
-            new Enemy(
-                {
-                    imageSrc: assets.enemies.pufferfish('orange-swim-1.png', 'swim', 'orange'),
-                    aspectRatio: 198 / 241,
-                },
-                'pufferfish',
-                {
-                    swim: [
-                        assets.enemies.pufferfish('orange-swim-1.png', 'swim', 'orange'),
-                        assets.enemies.pufferfish('orange-swim-2.png', 'swim', 'orange'),
-                        assets.enemies.pufferfish('orange-swim-3.png', 'swim', 'orange'),
-                        assets.enemies.pufferfish('orange-swim-4.png', 'swim', 'orange'),
-                        assets.enemies.pufferfish('orange-swim-5.png', 'swim', 'orange'),
-                    ],
-                    hurt: [
-                        assets.enemies.pufferfish('orange-bubble-swim-1.png', 'bubble-swim', 'orange'),
-                        assets.enemies.pufferfish('orange-bubble-swim-2.png', 'bubble-swim', 'orange'),
-                        assets.enemies.pufferfish('orange-bubble-swim-3.png', 'bubble-swim', 'orange'),
-                        assets.enemies.pufferfish('orange-bubble-swim-4.png', 'bubble-swim', 'orange'),
-                        assets.enemies.pufferfish('orange-bubble-swim-5.png', 'bubble-swim', 'orange'),
-                    ],
-                    dead: [
-                        assets.enemies.pufferfish('orange-dead-1.png', 'dead', 'orange'),
-                        assets.enemies.pufferfish('orange-dead-2.png', 'dead', 'orange'),
-                        assets.enemies.pufferfish('orange-dead-3.png', 'dead', 'orange'),
-                    ],
-                },
-                { maxHp: stats.pufferfishHp, damage: stats.pufferfishDmg }
-            ),
-            new Enemy(
-                {
-                    imageSrc: assets.enemies.jellyfish('super-dangerous-green-1.png', 'super-dangerous', 'green'),
-                    width: 125,
-                    aspectRatio: 300 / 211,
-                },
-                'jellyfish',
-                {
-                    swim: [
-                        assets.enemies.jellyfish('super-dangerous-green-1.png', 'super-dangerous', 'green'),
-                        assets.enemies.jellyfish('super-dangerous-green-2.png', 'super-dangerous', 'green'),
-                        assets.enemies.jellyfish('super-dangerous-green-3.png', 'super-dangerous', 'green'),
-                        assets.enemies.jellyfish('super-dangerous-green-4.png', 'super-dangerous', 'green'),
-                    ],
-                    dead: [
-                        assets.enemies.jellyfish('dead-green-1.png', 'dead', 'green'),
-                        assets.enemies.jellyfish('dead-green-2.png', 'dead', 'green'),
-                        assets.enemies.jellyfish('dead-green-3.png', 'dead', 'green'),
-                        assets.enemies.jellyfish('dead-green-4.png', 'dead', 'green'),
-                    ],
-                },
-                { maxHp: stats.jellyfishSuperHp, damage: stats.jellyfishSuperDmg }
-            ),
-        ],
+        enemies,
         boss,
         collectibles,
         {

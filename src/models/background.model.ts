@@ -1,7 +1,7 @@
-import { MovableObject, type MovableObjectConfig } from '@models/movable-object.model'
+import { DrawableObject, type DrawableObjectConfig } from '@models/drawable-object.model'
 
-export class Background extends MovableObject {
-    constructor(config: MovableObjectConfig) {
+export class Background extends DrawableObject {
+    constructor(config: DrawableObjectConfig) {
         super(config)
     }
 }

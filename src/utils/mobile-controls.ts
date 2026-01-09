@@ -13,7 +13,9 @@ const KEY_META: Record<MobileKey, KeyMeta> = {
 
 const isTouchLike = () => {
     if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
-        if (window.matchMedia('(hover: none) and (pointer: coarse)').matches) return true
+        if (window.matchMedia('(hover: none) and (pointer: coarse)').matches) {
+            return true
+        }
     }
     return (navigator.maxTouchPoints ?? 0) > 0
 }
@@ -31,7 +33,10 @@ export class MobileControls {
     }
 
     show() {
-        if (!this.enabled) return
+        if (!this.enabled) {
+            return
+        }
+
         this.root.classList.remove('is-hidden')
     }
 
@@ -64,12 +69,16 @@ export class MobileControls {
     }
 
     private onPointerDown(e: PointerEvent, key: MobileKey, btn: HTMLButtonElement) {
-        if (!this.enabled) return
+        if (!this.enabled) {
+            return
+        }
 
         e.preventDefault()
         e.stopPropagation()
 
-        if (this.activePointerByKey.has(key)) return
+        if (this.activePointerByKey.has(key)) {
+            return
+        }
 
         this.activePointerByKey.set(key, e.pointerId)
         btn.setPointerCapture(e.pointerId)
@@ -78,7 +87,9 @@ export class MobileControls {
     }
 
     private onPointerUp(e: Event, key: MobileKey, btn: HTMLButtonElement) {
-        if (!this.enabled) return
+        if (!this.enabled) {
+            return
+        }
 
         e.preventDefault?.()
         e.stopPropagation?.()
@@ -86,7 +97,9 @@ export class MobileControls {
         const activeId = this.activePointerByKey.get(key)
         const pointerId = (e as PointerEvent).pointerId
 
-        if (typeof activeId === 'number' && typeof pointerId === 'number' && activeId !== pointerId) return
+        if (typeof activeId === 'number' && typeof pointerId === 'number' && activeId !== pointerId) {
+            return
+        }
 
         try {
             if (typeof (e as PointerEvent).pointerId === 'number') btn.releasePointerCapture((e as PointerEvent).pointerId)

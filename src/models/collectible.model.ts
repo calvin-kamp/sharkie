@@ -1,5 +1,6 @@
 import { DrawableObject, type DrawableObjectConfig } from '@models/drawable-object.model'
 import type { HitboxConfig } from '@models/movable-object.model'
+import type { Player } from '@models/player.model'
 
 export type CollectibleType = 'coin' | 'poison'
 
@@ -69,6 +70,27 @@ export class Collectible extends DrawableObject {
     collect() {
         this.isCollected = true
         this.stopAnimation()
+    }
+
+    collectFor(player: Player) {
+        if (this.isCollected) {
+            return
+        }
+
+        this.applyEffect(player)
+        this.collect()
+    }
+
+    private applyEffect(player: Player) {
+        if (this.type === 'coin') {
+            player.addCoins(this.value)
+            console.log(`[PICKUP] COIN -> coins: ${player.coins}`)
+            
+            return
+        }
+
+        player.addPoisonBottles(this.value)
+        console.log(`[PICKUP] POISON -> poison: ${player.poisonBottles}`)
     }
 
     freeze() {

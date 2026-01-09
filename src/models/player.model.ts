@@ -69,7 +69,7 @@ export class Player extends MovableObject {
     } as const
 
     private lastHurtAt = 0
-    private readonly hurtCooldownMs = 250
+    private readonly hurtCooldownMs = 1000
 
     private lastAttackAt = 0
     private readonly attackCooldownMs = 500
@@ -273,21 +273,23 @@ export class Player extends MovableObject {
             return
         }
 
-        this.hp = Math.max(0, this.hp - amount)
-
-        if (this.hp <= 0) {
-            this.die(variant)
-
+        // Prevent repeated damage while playing hurt animation
+        if (this.state === 'hurt') {
             return
         }
 
         const now = Date.now()
-        
         if (now - this.lastHurtAt < this.hurtCooldownMs) {
             return
         }
 
         this.lastHurtAt = now
+        this.hp = Math.max(0, this.hp - amount)
+
+        if (this.hp <= 0) {
+            this.die(variant)
+            return
+        }
 
         this.setState('hurt', variant)
     }
@@ -357,134 +359,108 @@ export class Player extends MovableObject {
             this.poisonBottles = Math.max(0, this.poisonBottles - 1)
         }
 
+        const hb = this.getHitbox()
+        const spawnMargin = 12
+        const spawnX = this.directionLeft ? hb.x - spawnMargin : hb.x + hb.width + spawnMargin
+        const spawnY = hb.y + hb.height * 0.5
+
         this.world.addProjectile({
             poisoned: wantsPoisoned,
-            x: this.x + this.width * 0.6,
-            y: this.y + this.calculatedHeight * 0.45,
+            x: spawnX,
+            y: spawnY,
             directionLeft: this.directionLeft,
         })
     }
 
     private setState(state: PlayerState, variant: HurtVariant | AttackVariant = 'electric-shock') {
-
-        const sameState = this.state === state
-        const sameVariant =
-            state === 'hurt'
-                ? this.hurtVariant === (variant as HurtVariant)
-                : state === 'attack'
-                    ? this.attackVariant === (variant as AttackVariant)
-                    : true
-
-        if (sameState && sameVariant) {
+        if (this.isSameState(state, variant)) {
             return
         }
 
         this.state = state
         this.currentImage = 0
+        if (state === 'hurt') this.hurtVariant = variant as HurtVariant
+        if (state === 'attack') this.attackVariant = variant as AttackVariant
+
+        const { frames, fps, loop } = this.computeAnimation(state, variant)
+        this.applyAnimation(frames, fps, loop)
+    }
+
+    private isSameState(state: PlayerState, variant: HurtVariant | AttackVariant): boolean {
+        const sameState = this.state === state
+        const sameVariant =
+            state === 'hurt'
+                ? this.hurtVariant === (variant as HurtVariant)
+                : state === 'attack'
+                ? this.attackVariant === (variant as AttackVariant)
+                : true
+        return sameState && sameVariant
+    }
+
+    private computeAnimation(state: PlayerState, variant: HurtVariant | AttackVariant) {
+        if (state === 'dead') {
+            return {
+                frames: variant === 'poisoned' ? this.imagesDeadPoisoned : this.imagesDeadElectricShock,
+                fps: this.ANIM_FPS.dead,
+                loop: false,
+            }
+        }
 
         if (state === 'hurt') {
-            this.hurtVariant = variant as HurtVariant
+            return {
+                frames: variant === 'poisoned' ? this.imagesHurtPoisoned : this.imagesHurtElectricShock,
+                fps: this.ANIM_FPS.hurt,
+                loop: false,
+            }
         }
 
         if (state === 'attack') {
-            this.attackVariant = variant as AttackVariant
-        }
-        
-        let frames: string[] = this.imagesSwim
-        let fps: number = this.ANIM_FPS.swim
-        let loop = true
-
-        if (state === 'dead') {
-
-            frames = (variant === 'poisoned' ? this.imagesDeadPoisoned : this.imagesDeadElectricShock)
-            fps = this.ANIM_FPS.dead
-            loop = false
-
-        } else if (state === 'hurt') {
-
-            frames = (variant === 'poisoned' ? this.imagesHurtPoisoned : this.imagesHurtElectricShock)
-            fps = this.ANIM_FPS.hurt
-            loop = false
-
-        } else if (state === 'attack') {
-            
-            if (variant === 'fin-slap') {
-                frames = this.imagesAttackFinSlap
-                fps = this.ANIM_FPS.attackFinSlap
-            
-            } else if (variant === 'bubble-trap') {
-            
-                frames = this.imagesAttackBubbleTrap
-                fps = this.ANIM_FPS.bubbleTrap
-            
-            } else if (variant === 'bubble-trap-no-bubble') {
-            
-                frames = this.imagesAttackBubbleTrapNoBubble
-                fps = this.ANIM_FPS.bubbleTrapNoBubble
-            
-            } else {
-            
-                frames = this.imagesAttackBubbleTrapPoisoned
-                fps = this.ANIM_FPS.bubbleTrapPoisoned
-            
-            }
-            
-            loop = false
-        } else if (state === 'idle') {
-            
-            frames = this.imagesIdle
-            fps = this.ANIM_FPS.idle
-            loop = false
-        
-        } else if (state === 'idleLong') {
-        
-            frames = this.imagesIdleLong
-            fps = this.ANIM_FPS.idleLong
-            loop = true
-        
-        } else if (state === 'swim') {
-        
-            frames = this.imagesSwim
-            fps = this.ANIM_FPS.swim
-            loop = true
-        
+            if (variant === 'fin-slap')
+                return { frames: this.imagesAttackFinSlap, fps: this.ANIM_FPS.attackFinSlap, loop: false }
+            if (variant === 'bubble-trap')
+                return { frames: this.imagesAttackBubbleTrap, fps: this.ANIM_FPS.bubbleTrap, loop: false }
+            if (variant === 'bubble-trap-no-bubble')
+                return { frames: this.imagesAttackBubbleTrapNoBubble, fps: this.ANIM_FPS.bubbleTrapNoBubble, loop: false }
+            return { frames: this.imagesAttackBubbleTrapPoisoned, fps: this.ANIM_FPS.bubbleTrapPoisoned, loop: false }
         }
 
+        if (state === 'idle') {
+            return { frames: this.imagesIdle, fps: this.ANIM_FPS.idle, loop: false }
+        }
+
+        if (state === 'idleLong') {
+            return { frames: this.imagesIdleLong, fps: this.ANIM_FPS.idleLong, loop: true }
+        }
+
+        return { frames: this.imagesSwim, fps: this.ANIM_FPS.swim, loop: true }
+    }
+
+    private applyAnimation(frames: string[], fps: number, loop: boolean) {
         this.cacheImages(frames)
-        
-        if (this.cachedImages.length > 0) {
-            this.img = this.cachedImages[0]
+        if (this.cachedImages.length > 0) this.img = this.cachedImages[0]
+
+        this.restartAnimation(loop, fps, () => this.onAnimationComplete())
+    }
+
+    private onAnimationComplete() {
+        if (this.state === 'dead') {
+            this.deadAnimationFinished = true
+            return
         }
 
-        this.restartAnimation(loop, fps, () => {
-            if (this.state === 'dead') {
-                this.deadAnimationFinished = true
-                
-                return
-            }
+        if (this.state === 'attack') {
+            this.onAttackAnimationFinished()
+        }
 
-            if (this.state === 'attack') {
-                this.onAttackAnimationFinished()
-            }
+        if (this.state === 'idle') {
+            if (!this.isDead && !this.isMoving()) this.setState('idleLong')
+            else this.setState('swim')
+            return
+        }
 
-            if (this.state === 'idle') {
-                if (!this.isDead && !this.isMoving()) {
-                
-                    this.setState('idleLong')
-                
-                } else {
-                
-                    this.setState('swim')
-                
-                }
-                
-                return
-            }
-
-            if (this.state === 'hurt' || this.state === 'attack') {
-                this.setState('swim')
-            }
-        })
+        if (this.state === 'hurt' || this.state === 'attack') {
+            this.setState('swim')
+        }
     }
 
     private restartAnimation(loop: boolean, fps: number, onComplete?: () => void) {
@@ -540,63 +516,58 @@ export class Player extends MovableObject {
             return
         }
 
-        this.moveIntervalId = window.setInterval(() => {
-            if (!this.world || this.world.isPaused || (this.world.isFrozen && this.state !== 'dead') || this.state === 'hurt' || this.state === 'attack' || this.state === 'dead' || this.isDead) {
-                return
-            }
-            
-            const moving = this.isMoving()
+        this.moveIntervalId = window.setInterval(() => this.onMoveTick(), 1000 / 60)
+    }
 
-            if (moving) {
+    private onMoveTick() {
+        if (!this.world || this.world.isPaused || (this.world.isFrozen && this.state !== 'dead') || this.state === 'attack' || this.state === 'hurt' || this.state === 'dead' || this.isDead) {
+            return
+        }
 
-                if (this.state !== 'swim') {
-                    this.setState('swim')
-                }
+        this.updateMovementState()
+        this.updateDirectionFromInput()
+        this.applyMovementWithinBounds()
+    }
 
-            } else {
+    private updateMovementState() {
+        const moving = this.isMoving()
+        if (moving) {
+            if (this.state !== 'swim' && this.state !== 'hurt') this.setState('swim')
+        } else {
+            if (this.state === 'swim') this.setState('idle')
+        }
+    }
 
-                if (this.state === 'swim') {
-                    this.setState('idle')
-                }
+    private updateDirectionFromInput() {
+        const intendsLeft = this.leftKeyPressed && !this.rightKeyPressed
+        const intendsRight = this.rightKeyPressed && !this.leftKeyPressed
+        if (intendsLeft) this.directionLeft = true
+        else if (intendsRight) this.directionLeft = false
+    }
 
-            }
-            
-            const intendsLeft = this.leftKeyPressed && !this.rightKeyPressed
-            const intendsRight = this.rightKeyPressed && !this.leftKeyPressed
+    private applyMovementWithinBounds() {
+        const hb = this.getHitbox()
+        const offsetX = hb.x - this.x
+        const offsetY = hb.y - this.y
 
-            if (intendsLeft) this.directionLeft = true
-            else if (intendsRight) this.directionLeft = false
+        const minX = this.world!.worldLeft - offsetX
+        const maxX = this.world!.worldRight - (offsetX + hb.width)
 
-            const hb = this.getHitbox()
-            const offsetX = hb.x - this.x
-            const offsetY = hb.y - this.y
+        const minY = -offsetY
+        const maxY = this.world!.canvasHeight - (offsetY + hb.height)
 
-            const minX = this.world.worldLeft - offsetX
-            const maxX = this.world.worldRight - (offsetX + hb.width)
-
-            const minY = -offsetY
-            const maxY = this.world.canvasHeight - (offsetY + hb.height)
-
-            if (this.rightKeyPressed) {
-                this.x = Math.min(this.x + 50, maxX)
-                this.updateCamera()
-                this.directionLeft = false
-            }
-
-            if (this.leftKeyPressed) {
-                this.x = Math.max(this.x - 50, minX)
-                this.updateCamera()
-                this.directionLeft = true
-            }
-
-            if (this.topKeyPressed) {
-                this.y = Math.max(this.y - 20, minY)
-            }
-
-            if (this.bottomKeyPressed) {
-                this.y = Math.min(this.y + 20, maxY)
-            }
-        }, 1000 / 60)
+        if (this.rightKeyPressed) {
+            this.x = Math.min(this.x + 8, maxX)
+            this.updateCamera()
+            this.directionLeft = false
+        }
+        if (this.leftKeyPressed) {
+            this.x = Math.max(this.x - 8, minX)
+            this.updateCamera()
+            this.directionLeft = true
+        }
+        if (this.topKeyPressed) this.y = Math.max(this.y - 5, minY)
+        if (this.bottomKeyPressed) this.y = Math.min(this.y + 5, maxY)
     }
 
     private addEventTriggers() {
