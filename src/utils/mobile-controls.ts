@@ -58,6 +58,9 @@ export class MobileControls {
         this.bind()
     }
 
+    /**
+     * Shows mobile controls if touch is enabled
+     */
     show() {
         if (!this.enabled) {
             return
@@ -66,11 +69,17 @@ export class MobileControls {
         this.root.classList.remove('is-hidden')
     }
 
+    /**
+     * Hides mobile controls and releases all active touches
+     */
     hide() {
         this.releaseAll()
         this.root.classList.add('is-hidden')
     }
 
+    /**
+     * Releases all active pointer captures and dispatches keyup events
+     */
     releaseAll() {
         for (const key of this.activePointerByKey.keys()) {
             this.dispatchKey('keyup', key)
@@ -78,6 +87,10 @@ export class MobileControls {
         this.activePointerByKey.clear()
     }
 
+    /**
+     * Binds pointer event listeners to control buttons
+     * @private
+     */
     private bind() {
         const buttons = Array.from(this.root.querySelectorAll<HTMLButtonElement>('button[data-key]'))
 
@@ -94,6 +107,13 @@ export class MobileControls {
         }
     }
 
+    /**
+     * Handles pointer down event on a control button
+     * @param {PointerEvent} e - Pointer event
+     * @param {MobileKey} key - Control key
+     * @param {HTMLButtonElement} btn - Button element
+     * @private
+     */
     private onPointerDown(e: PointerEvent, key: MobileKey, btn: HTMLButtonElement) {
         if (!this.enabled) {
             return
@@ -112,6 +132,13 @@ export class MobileControls {
         this.dispatchKey('keydown', key)
     }
 
+    /**
+     * Handles pointer up/cancel event on a control button
+     * @param {Event} e - Pointer event
+     * @param {MobileKey} key - Control key
+     * @param {HTMLButtonElement} btn - Button element
+     * @private
+     */
     private onPointerUp(e: Event, key: MobileKey, btn: HTMLButtonElement) {
         if (!this.enabled) {
             return
@@ -139,6 +166,12 @@ export class MobileControls {
         }
     }
 
+    /**
+     * Dispatches a keyboard event for a mobile control key
+     * @param {'keydown' | 'keyup'} type - Event type
+     * @param {MobileKey} key - Control key
+     * @private
+     */
     private dispatchKey(type: 'keydown' | 'keyup', key: MobileKey) {
         const meta = KEY_META[key]
         const ev = new KeyboardEvent(type, {

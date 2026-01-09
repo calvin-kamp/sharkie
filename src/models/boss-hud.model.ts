@@ -10,12 +10,24 @@ import type { Boss } from '@models/boss.model'
  * Boss HUD manager displaying boss health bar during combat
  */
 export class BossHud {
+    /** Boss health bar component */
     private bar: StatusBar | null = null
+    /** Display name for the boss */
     private readonly displayName: string
+    /** Reference to the boss instance */
     private readonly boss: Boss
+    /** Canvas width in pixels */
     private readonly canvasWidth: number
+    /** Canvas height in pixels */
     private readonly canvasHeight: number
 
+    /**
+     * Creates a new boss HUD
+     * @param {Boss} boss - The boss to display health for
+     * @param {number} canvasWidth - Canvas width
+     * @param {number} canvasHeight - Canvas height
+     * @param {string} [displayName='Willy the Whale'] - Boss display name
+     */
     constructor(boss: Boss, canvasWidth: number, canvasHeight: number, displayName = 'Willy the Whale') {
         this.boss = boss
         this.canvasWidth = canvasWidth
@@ -23,6 +35,10 @@ export class BossHud {
         this.displayName = displayName
     }
 
+    /**
+     * Updates the health bar values when boss is visible
+     * @param {boolean} isVisible - Whether the boss is currently visible
+     */
     updateVisibleValues(isVisible: boolean) {
         if (!isVisible || !this.bar) {
             return
@@ -32,6 +48,11 @@ export class BossHud {
         this.bar.setValue(this.boss.hp)
     }
 
+    /**
+     * Renders the boss HUD on canvas
+     * @param {CanvasRenderingContext2D | null} ctx - Canvas rendering context
+     * @param {boolean} isVisible - Whether the boss is visible and HUD should render
+     */
     draw(ctx: CanvasRenderingContext2D | null, isVisible: boolean) {
         if (!ctx || !isVisible) {
             return
@@ -89,6 +110,10 @@ export class BossHud {
         this.drawName(ctx, bar)
     }
 
+    /**
+     * Ensures the health bar is initialized
+     * @private
+     */
     private ensureBar() {
         if (this.bar) {
             return
@@ -112,6 +137,12 @@ export class BossHud {
         })
     }
 
+    /**
+     * Draws the boss name above the health bar
+     * @param {CanvasRenderingContext2D} ctx - Canvas rendering context
+     * @param {any} bar - Status bar instance
+     * @private
+     */
     private drawName(ctx: CanvasRenderingContext2D, bar: any) {
         const visibleTopY = bar.y + bar.calculatedHeight * 0.22
         const nameY = Math.max(28, Math.floor(visibleTopY + 30))

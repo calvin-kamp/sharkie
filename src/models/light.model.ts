@@ -3,13 +3,18 @@
  * Represents light layers that create visual atmosphere in the game world.
  */
 
-import { DrawableObject, type DrawableObjectConfig } from '@models/drawable-object.model'
+import { MovableObject, type MovableObjectConfig } from '@models/movable-object.model'
 
 /**
  * Light overlay object for atmospheric visual effects
+ * Extends MovableObject for consistency with other game entities
  */
-export class Light extends DrawableObject {
-    constructor(config: DrawableObjectConfig) {
+export class Light extends MovableObject {
+    /**
+     * Creates a new light overlay
+     * @param {MovableObjectConfig} config - Configuration for the light object
+     */
+    constructor(config: MovableObjectConfig) {
         super({
             imageSrc: config.imageSrc,
             x: config.x ?? 50,

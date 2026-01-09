@@ -12,15 +12,32 @@ import { isColliding } from '@root/utils/geometry'
  * Collision manager handling player collisions with enemies and boss
  */
 export class CollisionManager {
+    /** Set of enemies currently colliding with player */
     private collidingEnemies = new Set<Enemy>()
+    /** Whether boss is currently colliding with player */
     private collidingBoss = false
+    /** Timestamp until which boss collision is ignored (grace period) */
     private bossCollisionGraceUntil = 0
+    /** Padding to apply to collision hitboxes */
     private readonly collisionPadding: number
 
+    /**
+     * Creates a new collision manager
+     * @param {number} [collisionPadding=6] - Padding for collision detection
+     */
     constructor(collisionPadding: number = 6) {
         this.collisionPadding = collisionPadding
     }
 
+    /**
+     * Updates collision detection for all entities
+     * @param {Player} player - The player to check collisions for
+     * @param {Enemy[]} enemies - Array of enemies to check
+     * @param {Boss} boss - The boss to check
+     * @param {boolean} bossVisible - Whether boss is visible/active
+     * @param {Function} onEnemyCollision - Callback when enemy collision occurs
+     * @param {Function} onBossCollision - Callback when boss collision occurs
+     */
     update(
         player: Player,
         enemies: Enemy[],
@@ -38,27 +55,54 @@ export class CollisionManager {
         this.updateBossCollision(player, boss, bossVisible, onBossCollision)
     }
 
+    /**
+     * Sets a grace period during which boss collisions are ignored
+     * @param {number} graceMs - Grace period in milliseconds
+     */
     setBossCollisionGrace(graceMs: number): void {
         this.bossCollisionGraceUntil = Date.now() + graceMs
     }
 
+    /**
+     * Clears all collision states
+     */
     clear(): void {
         this.collidingEnemies.clear()
         this.collidingBoss = false
     }
 
+    /**
+     * Checks if a specific enemy is currently colliding
+     * @param {Enemy} enemy - The enemy to check
+     * @returns {boolean} True if currently colliding
+     */
     isCollidingWithEnemy(enemy: Enemy): boolean {
         return this.collidingEnemies.has(enemy)
     }
 
+    /**
+     * Checks if boss is currently colliding with player
+     * @returns {boolean} True if boss is colliding
+     */
     isCollidingWithBoss(): boolean {
         return this.collidingBoss
     }
 
+    /**
+     * Checks if any collision (enemy or boss) is active
+     * @returns {boolean} True if any collision exists
+     */
     hasAnyCollision(): boolean {
         return this.collidingEnemies.size > 0 || this.collidingBoss
     }
 
+    /**
+     * Updates enemy collision states
+     * @param {Player} player - Player to check
+     * @param {Enemy[]} enemies - Enemies to check
+     * @param {Function} onCollision - Collision callback
+     * @private
+     */
     private updateEnemyCollisions(
         player: Player,
         enemies: Enemy[],
@@ -80,6 +124,14 @@ export class CollisionManager {
         this.collidingEnemies = next
     }
 
+    /**
+     * Updates boss collision state
+     * @param {Player} player - Player to check
+     * @param {Boss} boss - Boss to check
+     * @param {boolean} bossVisible - Whether boss is visible
+     * @param {Function} onCollision - Collision callback
+     * @private
+     */
     private updateBossCollision(
         player: Player,
         boss: Boss,

@@ -43,12 +43,20 @@ type StatusBarConfig = {
  * Status bar UI component for displaying health bars with animations
  */
 export class StatusBar extends DrawableObject {
+    /** Type of status bar */
     readonly type: StatusBarType
+    /** Color scheme of the bar */
     readonly color: StatusBarColor
 
+    /** Current value displayed */
     value: number
+    /** Maximum possible value */
     maxValue: number
 
+    /**
+     * Creates a new status bar
+     * @param {StatusBarConfig} config - Configuration for the status bar
+     */
     constructor(config: StatusBarConfig) {
         const color = config.color ?? 'purple'
 
@@ -81,11 +89,19 @@ export class StatusBar extends DrawableObject {
         ])
     }
 
+    /**
+     * Updates the maximum value and adjusts current value if needed
+     * @param {number} maxValue - New maximum value
+     */
     setMaxValue(maxValue: number) {
         this.maxValue = Math.max(1, maxValue)
         this.setValue(this.value)
     }
 
+    /**
+     * Updates the current value and refreshes the bar display
+     * @param {number} value - New current value
+     */
     setValue(value: number) {
         this.value = Math.max(0, value)
 
@@ -94,6 +110,14 @@ export class StatusBar extends DrawableObject {
         this.loadImage(StatusBar.getBarFrame(this.color, this.type, step))
     }
 
+    /**
+     * Converts value and maxValue to a step value for bar display
+     * @param {number} value - Current value
+     * @param {number} maxValue - Maximum value
+     * @returns {0 | 20 | 40 | 60 | 80 | 100} The step value
+     * @private
+     * @static
+     */
     private static toStep(value: number, maxValue: number): 0 | 20 | 40 | 60 | 80 | 100 {
         if (maxValue <= 0 || value <= 0) {
             return 0
@@ -127,6 +151,15 @@ export class StatusBar extends DrawableObject {
         return 100
     }
 
+    /**
+     * Gets the asset URL for a specific bar frame
+     * @param {StatusBarColor} color - Bar color scheme
+     * @param {StatusBarType} type - Bar type
+     * @param {number} step - Progress step (0-100)
+     * @returns {string} Asset URL for the bar frame
+     * @private
+     * @static
+     */
     private static getBarFrame(color: StatusBarColor, type: StatusBarType, step: number) {
         const suffix = step === 0 ? '00' : String(step)
         const fileName = `${color}-${type}-${suffix}.png`

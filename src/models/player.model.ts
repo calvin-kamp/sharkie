@@ -258,30 +258,55 @@ export class Player extends MovableObject {
         this.startMovement()
     }
 
+    /**
+     * Adds coins to the player's inventory
+     * @param {number} amount - Number of coins to add
+     */
     addCoins(amount: number) {
         const next = this.coins + Math.max(0, Math.floor(amount))
 
         this.coins = Math.max(0, Math.min(this.maxCoins, next))
     }
 
+    /**
+     * Adds poison bottles to the player's inventory
+     * @param {number} amount - Number of poison bottles to add
+     */
     addPoisonBottles(amount: number) {
         const next = this.poisonBottles + Math.max(0, Math.floor(amount))
 
         this.poisonBottles = Math.max(0, Math.min(this.maxPoisonBottles, next))
     }
 
+    /**
+     * Checks if the player is dead
+     * @returns {boolean} True if player HP is 0 or less
+     */
     get isDead() {
         return this.hp <= 0
     }
 
+    /**
+     * Checks if the death animation has finished
+     * @returns {boolean} True if death animation is complete
+     */
     get isDeadAnimationFinished() {
         return this.deadAnimationFinished
     }
 
+    /**
+     * Checks if player is currently moving
+     * @returns {boolean} True if any movement key is pressed
+     * @private
+     */
     private isMoving() {
         return this.rightKeyPressed || this.leftKeyPressed || this.topKeyPressed || this.bottomKeyPressed
     }
 
+    /**
+     * Sets the base combat statistics for the player
+     * @param {CombatConfig} combat - Combat configuration
+     */
     setBaseCombat(combat: CombatConfig) {
         if (typeof combat.maxHp === 'number') {
             this.baseMaxHp = combat.maxHp
@@ -300,6 +325,11 @@ export class Player extends MovableObject {
                 : this.maxHp
     }
 
+    /**
+     * Applies damage to the player
+     * @param {number} amount - Damage amount
+     * @param {HurtVariant} [variant='electric-shock'] - Type of damage
+     */
     takeDamage(amount: number, variant: HurtVariant = 'electric-shock') {
         if (this.isDead || amount <= 0) {
             return
@@ -325,6 +355,11 @@ export class Player extends MovableObject {
         this.setState('hurt', variant)
     }
 
+    /**
+     * Handles player death
+     * @param {HurtVariant} variant - Type of death animation
+     * @private
+     */
     private die(variant: HurtVariant) {
         if (this.state === 'dead') {
             return
@@ -333,6 +368,11 @@ export class Player extends MovableObject {
         this.setState('dead', variant)
     }
 
+    /**
+     * Checks if player can currently attack
+     * @returns {boolean} True if attack is allowed
+     * @private
+     */
     private canAttack() {
         if (!this.world || (this.world.isFrozen && this.state !== 'dead') || this.isDead || this.state === 'hurt' || this.state === 'attack' || this.state === 'dead') {
             return false
@@ -349,6 +389,10 @@ export class Player extends MovableObject {
         return true
     }
 
+    /**
+     * Executes a fin slap attack
+     * @private
+     */
     private attackFinSlap() {
         if (!this.canAttack()) {
             return
@@ -358,6 +402,11 @@ export class Player extends MovableObject {
         this.setState('attack', 'fin-slap')
     }
 
+    /**
+     * Executes a bubble trap attack
+     * @param {boolean} poisoned - Whether to use poisoned bubbles
+     * @private
+     */
     private attackBubbleTrap(poisoned: boolean) {
         if (!this.canAttack()) {
             return
@@ -374,6 +423,10 @@ export class Player extends MovableObject {
         this.setState('attack', poisoned ? 'bubble-trap-poisoned' : 'bubble-trap')
     }
 
+    /**
+     * Handles attack animation completion
+     * @private
+     */
     private onAttackAnimationFinished() {
         if (!this.world || !this.pendingBubbleFire) {
             return
@@ -403,6 +456,12 @@ export class Player extends MovableObject {
         })
     }
 
+    /**
+     * Changes the player state and updates animation
+     * @param {PlayerState} state - New player state
+     * @param {HurtVariant | AttackVariant} [variant='electric-shock'] - State variant
+     * @private
+     */
     private setState(state: PlayerState, variant: HurtVariant | AttackVariant = 'electric-shock') {
         if (this.isSameState(state, variant)) {
             return
@@ -417,6 +476,13 @@ export class Player extends MovableObject {
         this.applyAnimation(frames, fps, loop)
     }
 
+    /**
+     * Checks if state and variant match current state
+     * @param {PlayerState} state - State to check
+     * @param {HurtVariant | AttackVariant} variant - Variant to check
+     * @returns {boolean} True if state and variant match
+     * @private
+     */
     private isSameState(state: PlayerState, variant: HurtVariant | AttackVariant): boolean {
         const sameState = this.state === state
         const sameVariant =
@@ -428,6 +494,13 @@ export class Player extends MovableObject {
         return sameState && sameVariant
     }
 
+    /**
+     * Computes animation frames, FPS, and loop behavior for a state
+     * @param {PlayerState} state - Player state
+     * @param {HurtVariant | AttackVariant} variant - State variant
+     * @returns Animation configuration
+     * @private
+     */
     private computeAnimation(state: PlayerState, variant: HurtVariant | AttackVariant) {
         if (state === 'dead') {
             return {
@@ -466,6 +539,13 @@ export class Player extends MovableObject {
         return { frames: this.imagesSwim, fps: this.ANIM_FPS.swim, loop: true }
     }
 
+    /**
+     * Applies animation frames to the player
+     * @param {string[]} frames - Animation frames
+     * @param {number} fps - Frames per second
+     * @param {boolean} loop - Whether animation should loop
+     * @private
+     */
     private applyAnimation(frames: string[], fps: number, loop: boolean) {
         this.cacheImages(frames)
         if (this.cachedImages.length > 0) this.img = this.cachedImages[0]
@@ -473,6 +553,10 @@ export class Player extends MovableObject {
         this.restartAnimation(loop, fps, () => this.onAnimationComplete())
     }
 
+    /**
+     * Handles animation completion and state transitions
+     * @private
+     */
     private onAnimationComplete() {
         if (this.state === 'dead') {
             this.deadAnimationFinished = true
@@ -494,6 +578,13 @@ export class Player extends MovableObject {
         }
     }
 
+    /**
+     * Restarts animation with new parameters
+     * @param {boolean} loop - Whether animation should loop
+     * @param {number} fps - Frames per second
+     * @param {() => void} [onComplete] - Callback when animation completes
+     * @private
+     */
     private restartAnimation(loop: boolean, fps: number, onComplete?: () => void) {
         if (this.animIntervalId !== null) {
             clearInterval(this.animIntervalId)
@@ -542,6 +633,10 @@ export class Player extends MovableObject {
         }, delay)
     }
 
+    /**
+     * Starts the movement update loop
+     * @private
+     */
     private startMovement() {
         if (this.moveIntervalId !== null) {
             return
@@ -550,6 +645,10 @@ export class Player extends MovableObject {
         this.moveIntervalId = window.setInterval(() => this.onMoveTick(), 1000 / 60)
     }
 
+    /**
+     * Handles movement tick (60 FPS)
+     * @private
+     */
     private onMoveTick() {
         if (!this.world || this.world.isPaused || (this.world.isFrozen && this.state !== 'dead') || this.state === 'attack' || this.state === 'hurt' || this.state === 'dead' || this.isDead) {
             return
@@ -560,6 +659,10 @@ export class Player extends MovableObject {
         this.applyMovementWithinBounds()
     }
 
+    /**
+     * Updates player state based on movement input
+     * @private
+     */
     private updateMovementState() {
         const moving = this.isMoving()
         if (moving) {
@@ -569,6 +672,10 @@ export class Player extends MovableObject {
         }
     }
 
+    /**
+     * Updates player direction from keyboard input
+     * @private
+     */
     private updateDirectionFromInput() {
         const intendsLeft = this.leftKeyPressed && !this.rightKeyPressed
         const intendsRight = this.rightKeyPressed && !this.leftKeyPressed
@@ -576,6 +683,10 @@ export class Player extends MovableObject {
         else if (intendsRight) this.directionLeft = false
     }
 
+    /**
+     * Applies movement with boundary constraints
+     * @private
+     */
     private applyMovementWithinBounds() {
         const hb = this.getHitbox()
         const offsetX = hb.x - this.x
@@ -601,6 +712,10 @@ export class Player extends MovableObject {
         if (this.bottomKeyPressed) this.y = Math.min(this.y + 5, maxY)
     }
 
+    /**
+     * Sets up keyboard event listeners
+     * @private
+     */
     private addEventTriggers() {
         document.addEventListener('keydown', (e) => {
             if (this.world?.isPaused) {

@@ -28,8 +28,15 @@ export interface DrawableObjectConfig {
  * Manages image loading, caching, positioning, and rendering
  */
 export class DrawableObject {
+    /** Static cache for loaded images to prevent redundant loading */
     private static imageCache = new Map<string, HTMLImageElement>()
 
+    /**
+     * Retrieves or creates a cached image
+     * @param {string} src - Image source URL
+     * @returns {HTMLImageElement} The cached or newly created image
+     * @protected
+     */
     protected static getCachedImage(src: string): HTMLImageElement {
         const cached = this.imageCache.get(src)
         
@@ -43,15 +50,26 @@ export class DrawableObject {
         return img
     }
 
+    /** X position on canvas */
     x: number
+    /** Y position on canvas */
     y: number
+    /** Width in pixels */
     width: number
+    /** Optional explicit height (if not set, calculated from aspectRatio) */
     height?: number
+    /** Width to height ratio for automatic height calculation */
     protected aspectRatio: number
 
+    /** Primary image element */
     img: HTMLImageElement
+    /** Cached animation frame images */
     cachedImages: HTMLImageElement[] = []
 
+    /**
+     * Creates a new drawable object
+     * @param {DrawableObjectConfig} config - Configuration options
+     */
     constructor(config: DrawableObjectConfig) {
         this.img = DrawableObject.getCachedImage(config.imageSrc)
 
@@ -62,14 +80,27 @@ export class DrawableObject {
         this.aspectRatio = config.aspectRatio ?? 2 / 3
     }
 
+    /**
+     * Loads and caches a new primary image
+     * @param {string} imagePath - Path to the image
+     * @protected
+     */
     protected loadImage(imagePath: string) {
         this.img = DrawableObject.getCachedImage(imagePath)
     }
 
+    /**
+     * Pre-caches multiple images for animations
+     * @param {string[]} images - Array of image paths to cache
+     */
     cacheImages(images: string[]) {
         this.cachedImages = images.map((src) => DrawableObject.getCachedImage(src))
     }
 
+    /**
+     * Gets the calculated height based on width and aspect ratio
+     * @returns {number} The calculated or explicit height
+     */
     get calculatedHeight() {
         return this.height || Math.floor(this.width * this.aspectRatio)
     }

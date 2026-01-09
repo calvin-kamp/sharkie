@@ -54,6 +54,11 @@ export const drawEndScreen = (
     ctx.restore()
 }
 
+/**
+ * Binds event handlers for restarting the game after win/lose
+ * @param {HTMLCanvasElement} canvas - The game canvas element
+ * @param {Function} getEndState - Function that returns the current end state
+ */
 export const bindRestartHandlers = (canvas: HTMLCanvasElement, getEndState: () => EndState): void => {
     canvas.addEventListener('click', () => {
         if (getEndState() === 'none') {

@@ -34,10 +34,16 @@ export interface MovableObjectConfig extends DrawableObjectConfig {
  * Extends DrawableObject with hitbox and direction management
  */
 export class MovableObject extends DrawableObject {
+    /** Whether the object is facing left (true) or right (false) */
     directionLeft: boolean = false
 
+    /** Collision hitbox configuration with offset and dimensions */
     private hitbox: { offsetX: number; offsetY: number; width: number; height: number }
 
+    /**
+     * Creates a new movable object
+     * @param {MovableObjectConfig} config - Configuration including hitbox
+     */
     constructor(config: MovableObjectConfig) {
         super(config)
 
@@ -49,14 +55,27 @@ export class MovableObject extends DrawableObject {
         }
     }
 
+    /**
+     * Loads a new primary image
+     * @param {string} imagePath - Path to the image
+     * @protected
+     */
     protected loadImage(imagePath: string) {
         super.loadImage(imagePath)
     }
 
+    /**
+     * Caches multiple images for animations
+     * @param {string[]} images - Array of image paths
+     */
     cacheImages(images: string[]) {
         super.cacheImages(images)
     }
 
+    /**
+     * Updates the hitbox configuration
+     * @param {HitboxConfig} hitbox - New hitbox configuration (partial update supported)
+     */
     setHitbox(hitbox: HitboxConfig) {
         this.hitbox = {
             offsetX: hitbox.offsetX ?? this.hitbox.offsetX,
@@ -66,6 +85,11 @@ export class MovableObject extends DrawableObject {
         }
     }
 
+    /**
+     * Gets the current hitbox in world coordinates
+     * Accounts for direction (flips horizontally when facing left)
+     * @returns {Rect} The hitbox rectangle
+     */
     getHitbox() {
         const mirroredOffsetX = this.directionLeft
             ? this.width - this.hitbox.offsetX - this.hitbox.width
@@ -79,18 +103,30 @@ export class MovableObject extends DrawableObject {
         }
     }
 
+    /**
+     * Moves the object upward
+     */
     moveUp() {
         this.y -= 2.5
     }
 
+    /**
+     * Moves the object downward
+     */
     moveDown() {
         this.y += 2.5
     }
 
+    /**
+     * Moves the object to the left
+     */
     moveLeft() {
         this.x -= 2.5
     }
 
+    /**
+     * Moves the object to the right
+     */
     moveRight() {
         this.x += 2.5
     }

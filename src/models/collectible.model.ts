@@ -37,20 +37,33 @@ export type CollectibleConfig = DrawableObjectConfig & {
  * Handles animation, collision detection, and collection logic
  */
 export class Collectible extends DrawableObject {
+    /** Type of collectible (coin or poison) */
     readonly type: CollectibleType
+    /** Value awarded when collected */
     readonly value: number
 
+    /** Whether this collectible has been collected */
     isCollected = false
 
+    /** Collision hitbox configuration */
     private readonly hitbox: { offsetX: number; offsetY: number; width: number; height: number }
 
+    /** Current animation frame index */
     private currentFrame = 0
+    /** Animation interval timer ID */
     private animIntervalId: number | null = null
+    /** Animation frames per second */
     private readonly fps: number
 
+    /** Whether animation is frozen/paused */
     private frozen = false
+    /** Tracks if animation was running before freeze */
     private wasAnimating = false
 
+    /**
+     * Creates a new collectible item
+     * @param {CollectibleConfig} config - Collectible configuration
+     */
     constructor(config: CollectibleConfig) {
         super(config)
 
@@ -80,6 +93,10 @@ export class Collectible extends DrawableObject {
         }
     }
 
+    /**
+     * Gets the collision hitbox in world coordinates
+     * @returns {Rect} The hitbox rectangle
+     */
     getHitbox() {
         return {
             x: this.x + this.hitbox.offsetX,
@@ -89,11 +106,18 @@ export class Collectible extends DrawableObject {
         }
     }
 
+    /**
+     * Marks the collectible as collected and stops animation
+     */
     collect() {
         this.isCollected = true
         this.stopAnimation()
     }
 
+    /**
+     * Collects this item for the player, granting appropriate rewards
+     * @param {Player} player - The player collecting the item
+     */
     collectFor(player: Player) {
         if (this.isCollected) {
             return
@@ -103,6 +127,11 @@ export class Collectible extends DrawableObject {
         this.collect()
     }
 
+    /**
+     * Applies the collectible's effect to the player
+     * @param {Player} player - The player to apply effect to
+     * @private
+     */
     private applyEffect(player: Player) {
         if (this.type === 'coin') {
             player.addCoins(this.value)
@@ -115,6 +144,9 @@ export class Collectible extends DrawableObject {
         console.log(`[PICKUP] POISON -> poison: ${player.poisonBottles}`)
     }
 
+    /**
+     * Freezes the collectible animation
+     */
     freeze() {
         if (this.frozen) {
             return
@@ -130,6 +162,9 @@ export class Collectible extends DrawableObject {
         }
     }
 
+    /**
+     * Unfreezes the collectible animation
+     */
     unfreeze() {
         if (!this.frozen) {
             return
@@ -147,6 +182,10 @@ export class Collectible extends DrawableObject {
         }
     }
 
+    /**
+     * Starts the collectible animation
+     * @private
+     */
     private startAnimation() {
         if (this.frozen || this.animIntervalId !== null || this.cachedImages.length <= 1) {
             return
@@ -165,6 +204,10 @@ export class Collectible extends DrawableObject {
         }, delay)
     }
 
+    /**
+     * Stops the collectible animation
+     * @private
+     */
     private stopAnimation() {
         if (this.animIntervalId === null) {
             return
