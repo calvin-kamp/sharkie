@@ -70,7 +70,6 @@ export class Enemy extends MovableObject {
         this.type = type
         this.frames = { swim: framesInfo.swim, dead: framesInfo.dead, hurt: framesInfo.hurt }
 
-        // Random speeds and initial direction
         this.xSpeed = Math.round((Math.random() * (1.4 - 0.4) + 0.4) * 100) / 100
         this.ySpeed = Math.round((Math.random() * (1.2 - 0.3) + 0.3) * 100) / 100
         this.yDirection = Math.random() < 0.5 ? -1 : 1
@@ -126,14 +125,12 @@ export class Enemy extends MovableObject {
             }
         }
 
-        // jellyfish
         type JellyVariant = 'regular' | 'super-dangerous'
         const variant: JellyVariant = Math.random() < 0.5 ? 'regular' : 'super-dangerous'
         const color = variant === 'regular' ? (Math.random() < 0.5 ? 'purple' : 'yellow') : (Math.random() < 0.5 ? 'green' : 'pink')
 
         const swim = [1, 2, 3, 4].map((i) => assets.enemies.jellyfish(`${variant}-${color}-${i}.png`, variant, color))
 
-        // Dead frames use lowercase color names
         const dead = [1, 2, 3, 4].map((i) => assets.enemies.jellyfish(`dead-${color}-${i}.png`, 'dead', color))
 
         return {
@@ -294,7 +291,6 @@ export class Enemy extends MovableObject {
     
 
     private onDeadAnimationComplete() {
-        // Start floating upward after dead animation finishes
         this.startFloatingUpward()
     }
 
@@ -306,7 +302,6 @@ export class Enemy extends MovableObject {
         this.moveIntervalId = window.setInterval(() => {
             this.y -= 1.5
 
-            // Stop floating when fully off screen
             if (this.y + this.calculatedHeight < 0) {
                 this.stopMoving()
             }
@@ -364,7 +359,6 @@ export class Enemy extends MovableObject {
             if (this.type === 'pufferfish' || this.type === 'boss') {
                 this.x -= this.xSpeed
 
-                // Allow pufferfish to swim completely off screen to the left (beyond world boundaries)
                 if (this.x + this.width < -500) {
                     this.stopMoving()
                 }

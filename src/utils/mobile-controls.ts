@@ -104,7 +104,7 @@ export class MobileControls {
         try {
             if (typeof (e as PointerEvent).pointerId === 'number') btn.releasePointerCapture((e as PointerEvent).pointerId)
         } catch {
-            // ignore
+    
         }
 
         if (this.activePointerByKey.has(key)) {

@@ -90,7 +90,6 @@ export class Boss extends MovableObject {
         this.framesHurt = config.imagesHurt
 
         this.setFrames(this.framesFloating, this.ANIM_FPS.floating)
-        // Set boss hitbox once (constant)
         {
             const w = this.width
             const h = this.calculatedHeight
@@ -244,7 +243,6 @@ export class Boss extends MovableObject {
         this.introduced = true
         this.introducing = true
 
-        // If movement is disabled for hitbox testing, skip animation entirely
         if (this.movementDisabledForHitboxTesting) {
             this.introducing = false
             this.setFrames(this.framesFloating, this.ANIM_FPS.floating)
@@ -310,7 +308,6 @@ export class Boss extends MovableObject {
     }
 
     alignForIntro(player: Player, viewRight: number, worldLeft: number, worldRight: number, canvasHeight: number, spawnGap: number) {
-        // If movement is disabled for hitbox testing, center boss on screen
         if (this.movementDisabledForHitboxTesting) {
             const canvasWidth = viewRight - worldLeft
             this.x = worldLeft + (canvasWidth - this.width) / 2
@@ -319,10 +316,8 @@ export class Boss extends MovableObject {
             return
         }
 
-        // Position boss with 20% off-screen to the right (80% visible)
         this.x = viewRight - this.width * 0.8
         
-        // Position boss vertically centered relative to player
         const playerCenterY = player.y + player.calculatedHeight / 2
         const bossCenterY = this.calculatedHeight / 2
         this.y = Math.max(0, Math.min(playerCenterY - bossCenterY, canvasHeight - this.calculatedHeight))

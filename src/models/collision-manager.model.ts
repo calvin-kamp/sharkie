@@ -65,7 +65,6 @@ export class CollisionManager {
 
             if (isColliding(player, enemy, this.collisionPadding)) {
                 next.add(enemy)
-                // Always report collision; player handles hurt cooldown internally
                 onCollision(enemy)
             }
         }

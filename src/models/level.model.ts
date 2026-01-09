@@ -109,7 +109,6 @@ export class Level {
 
         const iconY = y + Math.floor((barHeight - iconSize) / 2)
         const poisonX = x + barWidth + gap
-        // Leave enough room for poison's icon (42), its text padding (12), and value text (~120)
         const coinX = poisonX + iconSize + 12 + 120
 
 

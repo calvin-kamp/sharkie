@@ -273,7 +273,6 @@ export class Player extends MovableObject {
             return
         }
 
-        // Prevent repeated damage while playing hurt animation
         if (this.state === 'hurt') {
             return
         }
