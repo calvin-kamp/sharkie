@@ -25,10 +25,10 @@ export class Level {
         aspectRatio: 815 / 1000,
 
         hitbox: {
-            offsetX: 40,
-            offsetY: 70,
-            width: 170,
-            height: 95,
+            offsetX: 50,
+            offsetY: 90,
+            width: 150,
+            height: 70,
         },
     })
 
@@ -109,7 +109,8 @@ export class Level {
 
         const iconY = y + Math.floor((barHeight - iconSize) / 2)
         const poisonX = x + barWidth + gap
-        const coinX = poisonX + iconSize + 120
+        // Leave enough room for poison's icon (42), its text padding (12), and value text (~120)
+        const coinX = poisonX + iconSize + 12 + 120
 
 
         this.hudCounters = [

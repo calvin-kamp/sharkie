@@ -1,6 +1,7 @@
 import { MovableObject, type MovableObjectConfig, type HitboxConfig } from '@models/movable-object.model'
 import type { CombatConfig } from '@models/combat.model'
 import type { Player } from '@models/player.model'
+import { clamp } from '@root/utils/geometry'
 
 export interface BossConfig {
     imagesIntroduce: string[]
@@ -23,9 +24,13 @@ export class Boss extends MovableObject {
     private introduced = false
     private introducing = false
     private attacking = false
+    private movementDisabledForHitboxTesting = false
 
     private lastHurtAt = 0
     private readonly hurtCooldownMs = 250
+
+    private lastAttackAt = 0
+    private readonly attackCooldownMs = 1000
 
     private animIntervalId: number | null = null
     private currentImage = 0
@@ -85,6 +90,18 @@ export class Boss extends MovableObject {
         this.framesHurt = config.imagesHurt
 
         this.setFrames(this.framesFloating, this.ANIM_FPS.floating)
+        // Set boss hitbox once (constant)
+        {
+            const w = this.width
+            const h = this.calculatedHeight
+            const hb = {
+                offsetX: Math.floor(w * 0.1),
+                offsetY: Math.floor(h * 0.65),
+                width: Math.floor(w * 0.7),
+                height: Math.floor(h * -0.1),
+            }
+            this.setHitbox(hb)
+        }
     }
 
     get isDead() {
@@ -139,7 +156,7 @@ export class Boss extends MovableObject {
     }
 
     private playHurtOnce() {
-        if (this.introducing || this.attacking) {
+        if (this.introducing || this.attacking || this.movementDisabledForHitboxTesting) {
             return
         }
 
@@ -160,9 +177,16 @@ export class Boss extends MovableObject {
     }
 
     playAttackOnce(onDone?: () => void) {
-        if (this.isDead || this.introducing || this.attacking) {
+        if (this.isDead || this.introducing || this.attacking || this.movementDisabledForHitboxTesting) {
             return
         }
+
+        const now = Date.now()
+        if (now - this.lastAttackAt < this.attackCooldownMs) {
+            return
+        }
+
+        this.lastAttackAt = now
         
         this.attacking = true
 
@@ -220,6 +244,14 @@ export class Boss extends MovableObject {
         this.introduced = true
         this.introducing = true
 
+        // If movement is disabled for hitbox testing, skip animation entirely
+        if (this.movementDisabledForHitboxTesting) {
+            this.introducing = false
+            this.setFrames(this.framesFloating, this.ANIM_FPS.floating)
+            onDone?.()
+            return
+        }
+
         this.setFrames(this.framesIntroduce, this.ANIM_FPS.introduce)
         this.play(false, () => {
             this.introducing = false
@@ -229,8 +261,25 @@ export class Boss extends MovableObject {
         })
     }
 
+    startIntroSequence(
+        player: Player,
+        viewRight: number,
+        worldLeft: number,
+        worldRight: number,
+        canvasHeight: number,
+        spawnGap: number,
+        onComplete: () => void
+    ): void {
+        this.alignForIntro(player, viewRight, worldLeft, worldRight, canvasHeight, spawnGap)
+        this.playIntroduceOnce(onComplete)
+    }
+
     chasePlayer(player: Player, dtMs: number, worldLeft: number, worldRight: number, canvasHeight: number) {
         if (!player || player.isDead || this.isDead || !this.introduced || this.introducing || this.attacking) {
+            return
+        }
+
+        if (this.movementDisabledForHitboxTesting) {
             return
         }
 
@@ -246,8 +295,8 @@ export class Boss extends MovableObject {
 
         this.directionLeft = dx > 0
 
-        const speedX = 16 * dt
-        const speedY = 12 * dt
+        const speedX = 4 * dt
+        const speedY = 3 * dt
 
         if (Math.abs(dx) > 2) {
             this.x += Math.sign(dx) * Math.min(speedX, Math.abs(dx))
@@ -257,13 +306,50 @@ export class Boss extends MovableObject {
             this.y += Math.sign(dy) * Math.min(speedY, Math.abs(dy))
         }
         
-        const minX = worldLeft
-        const maxX = worldRight - this.width
-        this.x = Math.min(Math.max(this.x, minX), maxX)
+        this.clampPositionWithin(worldLeft, worldRight, canvasHeight)
+    }
 
-        const minY = 0
-        const maxY = canvasHeight - this.calculatedHeight
-        this.y = Math.min(Math.max(this.y, minY), maxY)
+    alignForIntro(player: Player, viewRight: number, worldLeft: number, worldRight: number, canvasHeight: number, spawnGap: number) {
+        // If movement is disabled for hitbox testing, center boss on screen
+        if (this.movementDisabledForHitboxTesting) {
+            const canvasWidth = viewRight - worldLeft
+            this.x = worldLeft + (canvasWidth - this.width) / 2
+            this.y = (canvasHeight - this.calculatedHeight) / 2
+            this.directionLeft = false
+            return
+        }
+
+        // Position boss with 20% off-screen to the right (80% visible)
+        this.x = viewRight - this.width * 0.8
+        
+        // Position boss vertically centered relative to player
+        const playerCenterY = player.y + player.calculatedHeight / 2
+        const bossCenterY = this.calculatedHeight / 2
+        this.y = Math.max(0, Math.min(playerCenterY - bossCenterY, canvasHeight - this.calculatedHeight))
+
+        const bossCx = this.x + this.width / 2
+        const playerCx = player.x + player.width / 2
+        this.directionLeft = playerCx - bossCx > 0
+    }
+
+    clampPositionWithin(worldLeft: number, worldRight: number, canvasHeight: number) {
+        const bounds = this.getMovementBounds(worldLeft, worldRight, canvasHeight)
+        this.x = clamp(this.x, bounds.minX, bounds.maxX)
+        this.y = clamp(this.y, bounds.minY, bounds.maxY)
+    }
+
+    private getMovementBounds(worldLeft: number, worldRight: number, canvasHeight: number) {
+        const hb = this.getHitbox()
+        const offsetX = hb.x - this.x
+        const offsetY = hb.y - this.y
+
+        const minX = worldLeft - offsetX
+        const maxX = worldRight - (offsetX + hb.width)
+
+        const minY = -offsetY
+        const maxY = canvasHeight - (offsetY + hb.height)
+
+        return { minX, maxX, minY, maxY }
     }
 
     private setFrames(frames: string[], fps: number) {
@@ -327,4 +413,5 @@ export class Boss extends MovableObject {
             }
         }, delay)
     }
+
 }

@@ -1,14 +1,9 @@
 import { MovableObject, type MovableObjectConfig } from '@models/movable-object.model'
 import { getRandomNumber } from '@root/utils/helper'
+import { assets } from '@root/utils/assets'
 
 export type EnemyType = 'pufferfish' | 'jellyfish' | 'boss'
 type EnemyState = 'swim' | 'hurt' | 'dead'
-
-export interface EnemyFrames {
-    swim: string[]
-    dead: string[]
-    hurt?: string[]
-}
 
 export interface EnemyOptions {
     maxHp?: number
@@ -16,24 +11,25 @@ export interface EnemyOptions {
     damage?: number
 }
 
+type EnemyInit = Omit<MovableObjectConfig, 'imageSrc'>
+
 export class Enemy extends MovableObject {
     readonly type: EnemyType
     private state: EnemyState = 'swim'
 
-    private reachedCanvasLeftEnd = false
     private reachedCanvasTopEnd = false
     private reachedCanvasBottomEnd = false
 
     private moveIntervalId: number | null = null
     private animIntervalId: number | null = null
 
-    private frames: EnemyFrames
+    private frames: { swim: string[]; dead: string[]; hurt?: string[] }
     private currentImage = 0
 
     private readonly canvasHeight = 480
     private yDirection: 1 | -1 = 1
-    private readonly ySpeed = 0.5
-    private readonly xSpeed = 0.5
+    private ySpeed: number = 0.5
+    private xSpeed: number = 0.5
 
     private readonly ANIM_FPS = {
         swim: 8,
@@ -51,18 +47,33 @@ export class Enemy extends MovableObject {
     damage: number
 
     constructor(
-        config: MovableObjectConfig,
+        config: EnemyInit,
         type: EnemyType,
-        frames: EnemyFrames,
         options: EnemyOptions = {}
     ) {
-        super(config)
+        const randY = config.y ?? getRandomNumber(100, 400)
+        const randX = config.x ?? getRandomNumber(250, 2200)
+        const framesInfo = Enemy.generateFramesFor(type)
 
-        this.y = config.y ?? getRandomNumber(100, 400)
-        this.x = config.x ?? getRandomNumber(200, 700)
+        const base: MovableObjectConfig = {
+            imageSrc: framesInfo.initial,
+            x: randX,
+            y: randY,
+            width: config.width ?? framesInfo.defaults.width ?? 100,
+            aspectRatio: config.aspectRatio ?? framesInfo.defaults.aspectRatio ?? 300 / 211,
+            height: config.height,
+            hitbox: config.hitbox,
+        }
+
+        super(base)
 
         this.type = type
-        this.frames = frames
+        this.frames = { swim: framesInfo.swim, dead: framesInfo.dead, hurt: framesInfo.hurt }
+
+        // Random speeds and initial direction
+        this.xSpeed = Math.round((Math.random() * (1.4 - 0.4) + 0.4) * 100) / 100
+        this.ySpeed = Math.round((Math.random() * (1.2 - 0.3) + 0.3) * 100) / 100
+        this.yDirection = Math.random() < 0.5 ? -1 : 1
 
         this.baseMaxHp = options.maxHp ?? 100
         this.baseDamage = options.damage ?? 10
@@ -73,6 +84,64 @@ export class Enemy extends MovableObject {
 
         this.setState('swim')
         this.startMovement()
+        this.updatePufferfishHitbox()
+        if (this.type === 'jellyfish') {
+            const w = this.width
+            const h = this.calculatedHeight
+
+            const hb = {
+                offsetX: Math.floor(w * 0.15),
+                offsetY: Math.floor(h * 0.08),
+                width: Math.floor(w * 0.7),
+                height: Math.floor(h * 0.85),
+            }
+
+            this.setHitbox(hb)
+        }
+    }
+
+    private static generateFramesFor(type: EnemyType): {
+        initial: string
+        swim: string[]
+        dead: string[]
+        hurt?: string[]
+        defaults: { width?: number; aspectRatio?: number }
+    } {
+        if (type === 'pufferfish') {
+            const colors: Array<'green' | 'orange' | 'red'> = ['green', 'orange', 'red']
+            const color = colors[Math.floor(Math.random() * colors.length)]
+
+            const swim = [1, 2, 3, 4, 5].map((i) => assets.enemies.pufferfish(`${color}-swim-${i}.png`, 'swim', color))
+            const hurt = [1, 2, 3, 4, 5].map((i) =>
+                assets.enemies.pufferfish(`${color}-bubble-swim-${i}.png`, 'bubble-swim', color)
+            )
+            const dead = [1, 2, 3].map((i) => assets.enemies.pufferfish(`${color}-dead-${i}.png`, 'dead', color))
+
+            return {
+                initial: swim[0],
+                swim,
+                dead,
+                hurt,
+                defaults: { aspectRatio: 198 / 241 },
+            }
+        }
+
+        // jellyfish
+        type JellyVariant = 'regular' | 'super-dangerous'
+        const variant: JellyVariant = Math.random() < 0.5 ? 'regular' : 'super-dangerous'
+        const color = variant === 'regular' ? (Math.random() < 0.5 ? 'purple' : 'yellow') : (Math.random() < 0.5 ? 'green' : 'pink')
+
+        const swim = [1, 2, 3, 4].map((i) => assets.enemies.jellyfish(`${variant}-${color}-${i}.png`, variant, color))
+
+        // Dead frames use lowercase color names
+        const dead = [1, 2, 3, 4].map((i) => assets.enemies.jellyfish(`dead-${color}-${i}.png`, 'dead', color))
+
+        return {
+            initial: swim[0],
+            swim,
+            dead,
+            defaults: { width: variant === 'super-dangerous' ? 125 : 100, aspectRatio: 300 / 211 },
+        }
     }
 
     getType(): EnemyType {
@@ -101,6 +170,8 @@ export class Enemy extends MovableObject {
             typeof initialHp === 'number'
                 ? Math.min(this.maxHp, Math.max(0, initialHp))
                 : this.maxHp
+
+        this.updatePufferfishHitbox()
     }
 
     takeDamage(amount: number) {
@@ -124,6 +195,8 @@ export class Enemy extends MovableObject {
         ) {
             this.setState('hurt')
         }
+
+        this.updatePufferfishHitbox()
     }
 
     freeze() {
@@ -184,10 +257,63 @@ export class Enemy extends MovableObject {
         const loop = state !== 'dead'
         const fps = state === 'dead' ? this.ANIM_FPS.dead : state === 'hurt' ? this.ANIM_FPS.hurt : this.ANIM_FPS.swim
         
-        this.restartAnimation(loop, fps)
+        this.restartAnimation(loop, fps, () => {
+            if (state === 'dead') {
+                this.onDeadAnimationComplete()
+            }
+        })
+
     }
 
-    private restartAnimation(loop: boolean, fps: number) {
+    private updatePufferfishHitbox() {
+        if (this.type !== 'pufferfish') {
+            return
+        }
+
+        const isBloated = this.hp <= this.maxHp * 0.5
+        const w = this.width
+        const h = this.calculatedHeight
+
+        const normal = {
+            offsetX: Math.floor(w * -0.01),
+            offsetY: Math.floor(h * 0.1),
+            width: Math.floor(w * 0.9),
+            height: Math.floor(h * 0.65),
+        }
+
+        const bloated = {
+            offsetX: Math.floor(w * 0.05),
+            offsetY: Math.floor(h * 0.05),
+            width: Math.floor(w * 0.9),
+            height: Math.floor(h * 0.9),
+        }
+
+        this.setHitbox(isBloated ? bloated : normal)
+    }
+
+    
+
+    private onDeadAnimationComplete() {
+        // Start floating upward after dead animation finishes
+        this.startFloatingUpward()
+    }
+
+    private startFloatingUpward() {
+        if (this.moveIntervalId !== null) {
+            clearInterval(this.moveIntervalId)
+        }
+
+        this.moveIntervalId = window.setInterval(() => {
+            this.y -= 1.5
+
+            // Stop floating when fully off screen
+            if (this.y + this.calculatedHeight < 0) {
+                this.stopMoving()
+            }
+        }, 1000 / 60)
+    }
+
+    private restartAnimation(loop: boolean, fps: number, onComplete?: () => void) {
         if (this.frozen) {
             return
         }
@@ -219,6 +345,8 @@ export class Enemy extends MovableObject {
                     clearInterval(this.animIntervalId)
                     this.animIntervalId = null
                 }
+
+                onComplete?.()
             }
         }, delay)
     }
@@ -235,9 +363,9 @@ export class Enemy extends MovableObject {
             
             if (this.type === 'pufferfish' || this.type === 'boss') {
                 this.x -= this.xSpeed
-                this.hasReachedCanvasLeftEnd()
 
-                if (this.reachedCanvasLeftEnd) {
+                // Allow pufferfish to swim completely off screen to the left (beyond world boundaries)
+                if (this.x + this.width < -500) {
                     this.stopMoving()
                 }
                 
@@ -290,13 +418,6 @@ export class Enemy extends MovableObject {
         if (this.y >= bottom) {
             this.reachedCanvasBottomEnd = true
             this.y = bottom
-        }
-    }
-
-    private hasReachedCanvasLeftEnd() {
-        if (this.x <= 0) {
-            this.reachedCanvasLeftEnd = true
-            this.x = 0
         }
     }
 }
