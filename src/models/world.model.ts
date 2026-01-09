@@ -4,7 +4,7 @@
  * player, enemies, boss, projectiles, and collectibles.
  */
 
-import { MovableObject } from '@models/movable-object.model'
+import { DrawableObject } from '@models/drawable-object.model'
 import type { Player } from '@models/player.model'
 import type { Boss } from '@models/boss.model'
 import { Enemy } from '@models/enemy.model'
@@ -28,8 +28,8 @@ import type { Collectible } from '@models/collectible.model'
  */
 type LevelLike = {
     player: Player
-    lights: MovableObject[]
-    backgrounds: MovableObject[]
+    lights: DrawableObject[]
+    backgrounds: DrawableObject[]
     enemies: Enemy[]
     boss: Boss
 
@@ -44,8 +44,8 @@ type LevelLike = {
  */
 export class World {
     player: Player
-    lights: MovableObject[]
-    backgrounds: MovableObject[]
+    lights: DrawableObject[]
+    backgrounds: DrawableObject[]
     enemies: Enemy[]
     boss: Boss
     private onFinish?: () => void
@@ -518,53 +518,56 @@ export class World {
     }
 
     /**
-     * Adds multiple movable objects to canvas
-     * @param {MovableObject[]} movableObjects - Objects to render
+     * Adds multiple drawable/movable objects to canvas
+     * @param {DrawableObject[]} objects - Objects to render
      */
-    addObjectToCanvas(movableObjects: MovableObject[]) {
-        for (const movableObject of movableObjects) {
-            this.addToCanvas(movableObject)
+    addObjectToCanvas(objects: DrawableObject[]) {
+        for (const obj of objects) {
+            this.addToCanvas(obj)
         }
     }
 
     /**
-     * Adds a single movable object to canvas
-     * @param {MovableObject} movableObject - Object to render
+     * Adds a single drawable/movable object to canvas
+     * @param {DrawableObject} obj - Object to render
      */
-    addToCanvas(movableObject: MovableObject) {
+    addToCanvas(obj: DrawableObject) {
         if (!this.ctx) {
             return
         }
 
-        const img = (movableObject as any).img as HTMLImageElement | undefined
+        const img = (obj as any).img as HTMLImageElement | undefined
         
         if (!img || !img.complete || img.naturalWidth === 0) {
             return
         }
 
-        if (movableObject.directionLeft) {
+        const isMovable = 'directionLeft' in obj
+        const directionLeft = isMovable ? (obj as any).directionLeft : false
+
+        if (directionLeft) {
             this.ctx.save()
-            this.ctx.translate(movableObject.x + movableObject.width, movableObject.y)
+            this.ctx.translate((obj as any).x + (obj as any).width, (obj as any).y)
             this.ctx.scale(-1, 1)
 
-            this.ctx.drawImage(img, 0, 0, movableObject.width, movableObject.calculatedHeight)
+            this.ctx.drawImage(img, 0, 0, (obj as any).width, (obj as any).calculatedHeight)
 
             this.ctx.restore()
         } else {
-            this.ctx.drawImage(img, movableObject.x, movableObject.y, movableObject.width, movableObject.calculatedHeight)
+            this.ctx.drawImage(img, (obj as any).x, (obj as any).y, (obj as any).width, (obj as any).calculatedHeight)
         }
 
-        if (this.DEBUG_HITBOXES && this.isHitboxProvider(movableObject)) {
-            const isPlayer = movableObject === (this.player as any)
-            const isEnemy = movableObject instanceof Enemy
+        if (this.DEBUG_HITBOXES && this.isHitboxProvider(obj as any)) {
+            const isPlayer = obj === (this.player as any)
+            const isEnemy = obj instanceof Enemy
 
             const isColliding = isPlayer
                 ? this.collisionManager.hasAnyCollision()
                 : isEnemy
-                    ? this.collisionManager.isCollidingWithEnemy(movableObject as any)
+                    ? this.collisionManager.isCollidingWithEnemy(obj as any)
                     : false
 
-            this.drawHitbox(movableObject as any, isColliding ? 'red' : 'blue')
+            this.drawHitbox(obj as any, isColliding ? 'red' : 'blue')
         }
     }
 }

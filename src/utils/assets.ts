@@ -12,6 +12,14 @@ export const getGameAssetUrl = (path: string): string =>
     new URL(`game/${path}`, window.location.href).toString()
 
 /**
+ * Constructs absolute assets URL from a relative path
+ * @param {string} path - Relative path to the asset
+ * @returns {string} Absolute URL to the asset
+ */
+export const getAssetUrl = (path: string): string =>
+    new URL(`assets/${path}`, window.location.href).toString()
+
+/**
  * Centralized asset URL builders organized by asset type
  * @type {Object}
  * @property {Object} enemies - Enemy sprite asset builders
@@ -197,4 +205,32 @@ export const assets = {
                 getGameAssetUrl(`misc/hud/bars/${color}/${type}/${fileName}`),
         },
     },
-} as const
+}
+
+/**
+ * Audio and UI assets
+ */
+export const audioAssets = {
+    /**
+     * Gets background music audio URL
+     * @returns {string} Asset URL
+     */
+    backgroundMusic: () => getGameAssetUrl('sound/game-sound.mp3'),
+}
+
+/**
+ * Icon assets
+ */
+export const iconAssets = {
+    /**
+     * Gets audio on icon URL
+     * @returns {string} Asset URL
+     */
+    audioOn: () => getAssetUrl('icons/audio-on.svg'),
+
+    /**
+     * Gets audio off icon URL
+     * @returns {string} Asset URL
+     */
+    audioOff: () => getAssetUrl('icons/audio-off.svg'),
+}
