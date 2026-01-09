@@ -3,18 +3,18 @@
  * Represents environmental visual layers in the game world.
  */
 
-import { MovableObject, type MovableObjectConfig } from '@models/movable-object.model'
+import { DrawableObject, type DrawableObjectConfig } from '@models/drawable-object.model'
 
 /**
  * Background object representing visual environmental layers
- * Extends MovableObject for consistency with game entity system
+ * Extends DrawableObject for consistency with game entity system
  */
-export class Background extends MovableObject {
+export class Background extends DrawableObject {
     /**
      * Creates a new background layer
-     * @param {MovableObjectConfig} config - Configuration for the background
+     * @param {DrawableObjectConfig} config - Configuration for the background
      */
-    constructor(config: MovableObjectConfig) {
+    constructor(config: DrawableObjectConfig) {
         super(config)
     }
 }
