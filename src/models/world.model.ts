@@ -78,6 +78,7 @@ export class World {
     private DEBUG_HITBOXES = false
 
     private lastFrameAt = 0
+    private initialRenderDelay = true
 
     constructor($canvas: HTMLCanvasElement, level: LevelLike) {
         this.canvas = $canvas
@@ -109,6 +110,20 @@ export class World {
         this.givePlayerWorldProperties()
         this.camera.syncToPlayer(this.player.x, this.player.width)
         bindRestartHandlers(this.canvas, () => this.endState)
+        
+        // Freeze enemies and player initially for 2.5s to allow rendering
+        this.freezeEnemies()
+        this.boss.freeze()
+        this.player.disableMovement()
+        
+        setTimeout(() => {
+            if (!this.isPaused && this.initialRenderDelay) {
+                this.unfreezeEnemies()
+                this.boss.unfreeze()
+                this.player.enableMovement()
+                this.initialRenderDelay = false
+            }
+        }, 2500)
     }
 
     /**
@@ -247,12 +262,12 @@ export class World {
         this.collectibleManager.unfreeze()
         this.playerHud.unfreeze()
         
-        if (!this.isFrozen) {
+        if (!this.isFrozen && !this.initialRenderDelay) {
             this.unfreezeEnemies()
         }
 
         const keepBossFrozen = this.pendingEndState !== 'none' || this.endState !== 'none'
-        if (!keepBossFrozen) {
+        if (!keepBossFrozen && !this.initialRenderDelay) {
             this.boss.unfreeze()
         }
     }
