@@ -4,7 +4,7 @@
     display: grid;
     place-items: center;
     padding: 24px;
-    background: var(--color-white);
+    background: var(--color-bg);
     text-align: center;
     user-select: none;
     z-index: 9999;
@@ -18,7 +18,7 @@
 
     &__text {
         margin: 16px 0 0;
-        color: var(--color-bg);
+        color: var(--color-white);
         font-family: Arial, sans-serif;
         font-weight: 700;
         font-size: 16px;
