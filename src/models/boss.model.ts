@@ -127,10 +127,18 @@ export class Boss extends MovableObject {
         }
     }
 
+    /**
+     * Checks if the boss is dead
+     * @returns {boolean} True if boss HP is 0 or less
+     */
     get isDead() {
         return this.hp <= 0
     }
 
+    /**
+     * Sets the base combat statistics for the boss
+     * @param {CombatConfig} combat - Combat configuration
+     */
     setBaseCombat(combat: CombatConfig) {
         if (typeof combat.maxHp === 'number') {
             this.baseMaxHp = combat.maxHp
@@ -149,6 +157,10 @@ export class Boss extends MovableObject {
                 : this.maxHp
     }
 
+    /**
+     * Applies damage to the boss
+     * @param {number} amount - Damage amount
+     */
     takeDamage(amount: number) {
         if (this.isDead || amount <= 0) {
             return
@@ -172,12 +184,20 @@ export class Boss extends MovableObject {
         this.playHurtOnce()
     }
 
+    /**
+     * Handles boss death
+     * @private
+     */
     private die() {
         this.attacking = false
         this.setFrames(this.framesDead, this.ANIM_FPS.dead)
         this.play(false)
     }
 
+    /**
+     * Plays the hurt animation once
+     * @private
+     */
     private playHurtOnce() {
         if (this.introducing || this.attacking || this.movementDisabledForHitboxTesting) {
             return
@@ -199,6 +219,10 @@ export class Boss extends MovableObject {
         })
     }
 
+    /**
+     * Plays the attack animation once
+     * @param {Function} [onDone] - Callback when attack completes
+     */
     playAttackOnce(onDone?: () => void) {
         if (this.isDead || this.introducing || this.attacking || this.movementDisabledForHitboxTesting) {
             return
@@ -232,6 +256,9 @@ export class Boss extends MovableObject {
         })
     }
 
+    /**
+     * Freezes boss animations
+     */
     freeze() {
         if (this.frozen) {
             return
@@ -246,6 +273,9 @@ export class Boss extends MovableObject {
         }
     }
 
+    /**
+     * Unfreezes boss animations
+     */
     unfreeze() {
         if (!this.frozen) {
             return
@@ -331,7 +361,16 @@ export class Boss extends MovableObject {
         this.clampPositionWithin(worldLeft, worldRight, canvasHeight)
     }
 
-    alignForIntro(player: Player, viewRight: number, worldLeft: number, worldRight: number, canvasHeight: number, spawnGap: number) {
+    /**
+     * Positions the boss for introduction sequence
+     * @param {Player} player - The player character
+     * @param {number} viewRight - Right edge of the viewport
+     * @param {number} worldLeft - Left boundary of the world
+     * @param {number} _worldRight - Right boundary of the world (unused)
+     * @param {number} canvasHeight - Height of the canvas
+     * @param {number} _spawnGap - Spawn gap parameter (unused)
+     */
+    alignForIntro(player: Player, viewRight: number, worldLeft: number, _worldRight: number, canvasHeight: number, _spawnGap: number) {
         if (this.movementDisabledForHitboxTesting) {
             const canvasWidth = viewRight - worldLeft
             this.x = worldLeft + (canvasWidth - this.width) / 2

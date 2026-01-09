@@ -111,10 +111,19 @@ export class World {
         bindRestartHandlers(this.canvas, () => this.endState)
     }
 
+    /**
+     * Adds a projectile to the world
+     * @param {Projectile | ProjectileConfig | ProjectileSpawn} projectile - Projectile to add
+     */
     addProjectile(projectile: Projectile | ProjectileConfig | ProjectileSpawn) {
         this.projectileManager.add(projectile)
     }
 
+    /**
+     * Calculates world boundaries from backgrounds and lights
+     * @returns World bounds (left and right edges)
+     * @private
+     */
     private getWorldBounds() {
         const objects = [...(this.backgrounds ?? []), ...(this.lights ?? [])]
         
@@ -128,10 +137,19 @@ export class World {
         return { left, right }
     }
 
+    /**
+     * Checks if world is stopped (frozen or paused)
+     * @returns {boolean} True if frozen or paused
+     * @private
+     */
     private get isStopped() {
         return this.isFrozen || this.isPaused
     }
 
+    /**
+     * Sets the camera offset and triggers boss intro if at edge
+     * @param {number} nextOffset - New camera offset
+     */
     setCameraOffset(nextOffset: number) {
         this.camera.setOffset(nextOffset)
 
@@ -140,6 +158,10 @@ export class World {
         }
     }
 
+    /**
+     * Starts the boss introduction sequence
+     * @private
+     */
     private startBossIntroduceSequence() {
         this.bossSequenceStarted = true
         this.bossVisible = true
@@ -161,18 +183,30 @@ export class World {
         )
     }
 
+    /**
+     * Freezes all enemies
+     * @private
+     */
     private freezeEnemies(): void {
         for (const e of this.enemies) {
             e.freeze()
         }
     }
 
+    /**
+     * Unfreezes all enemies
+     * @private
+     */
     private unfreezeEnemies(): void {
         for (const e of this.enemies) {
             e.unfreeze()
         }
     }
 
+    /**
+     * Handles boss intro completion
+     * @private
+     */
     private onBossIntroComplete(): void {
         this.isFrozen = false
         this.bossFightActive = true
@@ -183,10 +217,17 @@ export class World {
         }
     }
 
+    /**
+     * Gives the player a reference to the world
+     */
     givePlayerWorldProperties() {
         this.player.world = this
     }
 
+    /**
+     * Sets the paused state of the world
+     * @param {boolean} paused - Whether to pause
+     */
     setPaused(paused: boolean) {
         if (paused === this.isPaused) {
             return
@@ -216,6 +257,11 @@ export class World {
         }
     }
 
+    /**
+     * Updates boss chase behavior
+     * @param {number} dtMs - Delta time in milliseconds
+     * @private
+     */
     private updateBossChase(dtMs: number) {
         if (this.isStopped || !this.bossVisible || !this.bossFightActive || this.player.isDead || this.boss.isDead) {
             return
@@ -224,6 +270,10 @@ export class World {
         this.boss.chasePlayer(this.player, dtMs, this.worldLeft, this.worldRight, this.canvasHeight)
     }
 
+    /**
+     * Updates collectible pickups
+     * @private
+     */
     private updatePickups() {
         if (this.isStopped) {
             return
@@ -232,6 +282,10 @@ export class World {
         this.collectibleManager.update(this.player)
     }
 
+    /**
+     * Updates collision detection
+     * @private
+     */
     private updateCollisions() {
         if (this.isStopped) {
             return
@@ -247,12 +301,21 @@ export class World {
         )
     }
 
+    /**
+     * Handles player-enemy collision
+     * @param {Enemy} enemy - Enemy that collided with player
+     * @private
+     */
     private onPlayerEnemyCollision(enemy: Enemy) {
         const hurtVariant = enemy.getType() === 'pufferfish' ? 'poisoned' : 'electric-shock'
         
         this.player.takeDamage(enemy.damage, hurtVariant)
     }
 
+    /**
+     * Handles player-boss collision
+     * @private
+     */
     private onPlayerBossCollision() {
         const playerHpBefore = this.player.hp
         this.player.takeDamage(this.boss.damage, 'electric-shock')
@@ -262,6 +325,11 @@ export class World {
         }
     }
 
+    /**
+     * Updates projectiles
+     * @param {number} dtMs - Delta time in milliseconds
+     * @private
+     */
     private updateProjectiles(dtMs: number) {
         if (this.isStopped) {
             return
@@ -270,11 +338,19 @@ export class World {
         this.projectileManager.update(dtMs, this.enemies, this.boss, this.bossVisible)
     }
 
+    /**
+     * Updates HUD elements
+     * @private
+     */
     private updateHud() {
         this.playerHud.update(this.player)
         this.bossHud.updateVisibleValues(this.bossVisible)
     }
 
+    /**
+     * Updates and checks end state conditions
+     * @private
+     */
     private updateEndState() {
         if (this.pendingEndState === 'lose' && this.endState === 'none') {
             if (this.player.isDeadAnimationFinished) {
@@ -309,10 +385,22 @@ export class World {
         }
     }
 
+    /**
+     * Type guard to check if object provides hitbox
+     * @param {any} o - Object to check
+     * @returns {boolean} True if object has getHitbox method
+     * @private
+     */
     private isHitboxProvider(o: any): o is HitboxProvider {
         return !!o && typeof o.getHitbox === 'function'
     }
 
+    /**
+     * Draws hitbox for debugging
+     * @param {any} mo - Movable object
+     * @param {string} color - Hitbox color
+     * @private
+     */
     private drawHitbox(mo: any, color: string) {
         if (!this.ctx) {
             return
@@ -330,6 +418,10 @@ export class World {
         this.ctx.stroke()
     }
 
+    /**
+     * Main draw loop - updates and renders all game objects
+     * @param {number} [now=performance.now()] - Current timestamp
+     */
     draw = (now: number = performance.now()) => {
         const dtMs = this.lastFrameAt === 0 ? 0 : now - this.lastFrameAt
         this.lastFrameAt = now
@@ -374,12 +466,20 @@ export class World {
         requestAnimationFrame((t) => this.draw(t))
     }
 
+    /**
+     * Adds multiple movable objects to canvas
+     * @param {MovableObject[]} movableObjects - Objects to render
+     */
     addObjectToCanvas(movableObjects: MovableObject[]) {
         for (const movableObject of movableObjects) {
             this.addToCanvas(movableObject)
         }
     }
 
+    /**
+     * Adds a single movable object to canvas
+     * @param {MovableObject} movableObject - Object to render
+     */
     addToCanvas(movableObject: MovableObject) {
         if (!this.ctx) {
             return

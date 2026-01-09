@@ -30,6 +30,12 @@ const POISON_FRAMES = [
     assets.misc.hud.poison('poison-animated-8.png', true),
 ]
 
+/**
+ * Creates a coin collectible at the specified position
+ * @param {number} x - X position
+ * @param {number} y - Y position
+ * @returns {Collectible} The created coin collectible
+ */
 const createCoin = (x: number, y: number) =>
     new Collectible({
         type: 'coin',
@@ -42,6 +48,12 @@ const createCoin = (x: number, y: number) =>
         aspectRatio: 1,
     })
 
+/**
+ * Creates a poison bottle collectible at the specified position
+ * @param {number} x - X position
+ * @param {number} y - Y position
+ * @returns {Collectible} The created poison collectible
+ */
 const createPoison = (x: number, y: number) =>
     new Collectible({
         type: 'poison',
@@ -54,6 +66,11 @@ const createPoison = (x: number, y: number) =>
         aspectRatio: 1,
     })
 
+/**
+ * Creates a complete game level with all entities and configuration
+ * @param {Difficulty} [difficulty='medium'] - The difficulty level
+ * @returns {Level} The fully configured level instance
+ */
 export const createLevel = (difficulty: Difficulty = 'medium') => {
     const stats = DIFFICULTY_STATS[difficulty]
 

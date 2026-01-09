@@ -81,6 +81,12 @@ export const DIFFICULTY_STATS: Record<Difficulty, DifficultyStats> = {
     },
 }
 
+/**
+ * Collectible item positions for the level
+ * @type {Object}
+ * @property {Array<{x: number, y: number}>} coins - Coin spawn positions
+ * @property {Array<{x: number, y: number}>} poisons - Poison bottle spawn positions
+ */
 export const LEVEL_COLLECTIBLES = {
     coins: [
         { x: 250, y: 330 },

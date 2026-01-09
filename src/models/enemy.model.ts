@@ -129,6 +129,13 @@ export class Enemy extends MovableObject {
         }
     }
 
+    /**
+     * Generates animation frame paths for the given enemy type
+     * @param {EnemyType} type - Type of enemy
+     * @returns Animation frame configuration
+     * @private
+     * @static
+     */
     private static generateFramesFor(type: EnemyType): {
         initial: string
         swim: string[]
@@ -171,14 +178,26 @@ export class Enemy extends MovableObject {
         }
     }
 
+    /**
+     * Gets the enemy type
+     * @returns {EnemyType} Enemy type
+     */
     getType(): EnemyType {
         return this.type
     }
 
+    /**
+     * Checks if the enemy is dead
+     * @returns {boolean} True if HP is 0 or less
+     */
     get isDead() {
         return this.hp <= 0
     }
 
+    /**
+     * Sets base combat statistics for the enemy
+     * @param {EnemyOptions} combat - Combat configuration
+     */
     setBaseCombat(combat: EnemyOptions) {
         if (typeof combat.maxHp === 'number') {
             this.baseMaxHp = combat.maxHp
@@ -201,6 +220,10 @@ export class Enemy extends MovableObject {
         this.updatePufferfishHitbox()
     }
 
+    /**
+     * Applies damage to the enemy
+     * @param {number} amount - Damage amount
+     */
     takeDamage(amount: number) {
         if (this.state === 'dead') {
             return
@@ -226,6 +249,9 @@ export class Enemy extends MovableObject {
         this.updatePufferfishHitbox()
     }
 
+    /**
+     * Freezes the enemy's movement and animation
+     */
     freeze() {
         if (this.frozen) {
             return
@@ -244,6 +270,9 @@ export class Enemy extends MovableObject {
         }
     }
 
+    /**
+     * Unfreezes the enemy's movement and animation
+     */
     unfreeze() {
         if (!this.frozen) {
             return
@@ -260,11 +289,20 @@ export class Enemy extends MovableObject {
         }
     }
 
+    /**
+     * Handles enemy death
+     * @private
+     */
     private die() {
         this.setState('dead')
         this.stopMoving()
     }
 
+    /**
+     * Changes the enemy state and updates animation
+     * @param {EnemyState} state - New enemy state
+     * @private
+     */
     private setState(state: EnemyState) {
         this.state = state
         this.currentImage = 0
@@ -292,6 +330,10 @@ export class Enemy extends MovableObject {
 
     }
 
+    /**
+     * Updates hitbox for pufferfish based on bloated state
+     * @private
+     */
     private updatePufferfishHitbox() {
         if (this.type !== 'pufferfish') {
             return
@@ -320,10 +362,18 @@ export class Enemy extends MovableObject {
 
     
 
+    /**
+     * Handles dead animation completion
+     * @private
+     */
     private onDeadAnimationComplete() {
         this.startFloatingUpward()
     }
 
+    /**
+     * Starts the floating upward animation for dead enemies
+     * @private
+     */
     private startFloatingUpward() {
         if (this.moveIntervalId !== null) {
             clearInterval(this.moveIntervalId)
@@ -338,6 +388,13 @@ export class Enemy extends MovableObject {
         }, 1000 / 60)
     }
 
+    /**
+     * Restarts animation with new parameters
+     * @param {boolean} loop - Whether animation should loop
+     * @param {number} fps - Frames per second
+     * @param {() => void} [onComplete] - Callback when animation completes
+     * @private
+     */
     private restartAnimation(loop: boolean, fps: number, onComplete?: () => void) {
         if (this.frozen) {
             return
@@ -376,6 +433,10 @@ export class Enemy extends MovableObject {
         }, delay)
     }
 
+    /**
+     * Starts the enemy movement loop
+     * @private
+     */
     private startMovement() {
         if (this.frozen || this.moveIntervalId !== null) {
             return
@@ -420,6 +481,10 @@ export class Enemy extends MovableObject {
         this.restartAnimation(true, fps)
     }
 
+    /**
+     * Stops the enemy movement
+     * @private
+     */
     private stopMoving() {
         if (this.moveIntervalId === null) {
             return
@@ -429,6 +494,10 @@ export class Enemy extends MovableObject {
         this.moveIntervalId = null
     }
 
+    /**
+     * Checks if jellyfish has reached top of canvas
+     * @private
+     */
     private hasReachedCanvasTopEnd() {
         if (this.y <= 0) {
             this.reachedCanvasTopEnd = true
@@ -436,6 +505,10 @@ export class Enemy extends MovableObject {
         }
     }
 
+    /**
+     * Checks if jellyfish has reached bottom of canvas
+     * @private
+     */
     private hasReachedCanvasBottomEnd() {
         const bottom = this.canvasHeight - this.calculatedHeight
 

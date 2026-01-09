@@ -19,6 +19,10 @@ export class PlayerHud {
         this.hudCounters = hudCounters
     }
 
+    /**
+     * Updates all HUD elements with current player stats
+     * @param {Player} player - The player to read stats from
+     */
     update(player: Player): void {
         for (const bar of this.statusBars) {
             ;(bar as any).setMaxValue?.(player.maxHp)
@@ -38,6 +42,10 @@ export class PlayerHud {
         }
     }
 
+    /**
+     * Renders all HUD elements on canvas
+     * @param {CanvasRenderingContext2D | null} ctx - Canvas rendering context
+     */
     draw(ctx: CanvasRenderingContext2D | null): void {
         if (!ctx) {
             return
@@ -58,12 +66,18 @@ export class PlayerHud {
         }
     }
 
+    /**
+     * Freezes all animated HUD elements
+     */
     freeze(): void {
         for (const counter of this.hudCounters) {
             (counter as any).freeze?.()
         }
     }
 
+    /**
+     * Unfreezes all animated HUD elements
+     */
     unfreeze(): void {
         for (const counter of this.hudCounters) {
             (counter as any).unfreeze?.()

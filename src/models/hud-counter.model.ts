@@ -36,16 +36,27 @@ export type HudCounterConfig = {
  * HUD counter component for displaying resource counts with animation
  */
 export class HudCounter extends DrawableObject {
+    /** Type of resource counter */
     readonly type: HudCounterType
+    /** Current resource value */
     value: number
 
+    /** Current animation frame index */
     private currentFrame = 0
+    /** Animation interval timer ID */
     private animIntervalId: number | null = null
+    /** Animation frames per second */
     private readonly fps: number
 
+    /** Whether animation is frozen/paused */
     private frozen = false
+    /** Tracks if animation was running before freeze */
     private wasAnimating = false
 
+    /**
+     * Creates a new HUD counter
+     * @param {HudCounterConfig} config - Counter configuration
+     */
     constructor(config: HudCounterConfig) {
         const width = config.width ?? 42
 
@@ -74,10 +85,18 @@ export class HudCounter extends DrawableObject {
         }
     }
 
+    /**
+     * Updates the counter value
+     * @param {number} value - New value to display
+     */
     setValue(value: number) {
         this.value = Math.max(0, value)
     }
 
+    /**
+     * Draws the counter with its icon and value on canvas
+     * @param {CanvasRenderingContext2D} ctx - Canvas rendering context
+     */
     draw(ctx: CanvasRenderingContext2D) {
         ctx.drawImage(this.img, this.x, this.y, this.width, this.calculatedHeight)
 
@@ -99,6 +118,9 @@ export class HudCounter extends DrawableObject {
         ctx.restore()
     }
 
+    /**
+     * Freezes the counter animation
+     */
     freeze() {
         if (this.frozen) {
             return
@@ -113,6 +135,9 @@ export class HudCounter extends DrawableObject {
         }
     }
 
+    /**
+     * Unfreezes the counter animation
+     */
     unfreeze() {
         if (!this.frozen) {
             return
@@ -126,6 +151,10 @@ export class HudCounter extends DrawableObject {
         }
     }
 
+    /**
+     * Starts the counter icon animation
+     * @private
+     */
     private startAnimation() {
         if (this.frozen || this.animIntervalId !== null || this.cachedImages.length <= 1) {
             return

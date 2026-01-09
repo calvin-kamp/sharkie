@@ -35,6 +35,9 @@ const game = {
     lastNonPauseScreen: 'main' as Screen,
     mobileControls: null as MobileControls | null,
 
+    /**
+     * Initializes the game by setting up canvas, menu, and event bindings
+     */
     init() {
         const $canvas = document.querySelector<HTMLCanvasElement>(component)
         const $menu = document.querySelector<HTMLElement>('[data-menu]')
@@ -55,6 +58,11 @@ const game = {
         this.showScreen($menu, 'main')
     },
 
+    /**
+     * Binds menu button click handlers
+     * @param {HTMLCanvasElement} $canvas - Canvas element
+     * @param {HTMLElement} $menu - Menu element
+     */
     bindMenu($canvas: HTMLCanvasElement, $menu: HTMLElement) {
         $menu.addEventListener('click', (e) => {
             const target = e.target as HTMLElement | null
@@ -131,6 +139,10 @@ const game = {
         })
     },
 
+    /**
+     * Binds Escape key handler for menu navigation
+     * @param {HTMLElement} $menu - Menu element
+     */
     bindEsc($menu: HTMLElement) {
         document.addEventListener('keydown', (e) => {
             if (e.key !== 'Escape') {
@@ -158,6 +170,12 @@ const game = {
         })
     },
 
+    /**
+     * Starts a new game with the selected difficulty
+     * @param {HTMLCanvasElement} $canvas - Canvas element
+     * @param {HTMLElement} $menu - Menu element
+     * @param {Difficulty} difficulty - Selected difficulty level
+     */
     startGame($canvas: HTMLCanvasElement, $menu: HTMLElement, difficulty: Difficulty) {
         if (this.world) {
             window.location.reload()
@@ -175,6 +193,10 @@ const game = {
         this.mobileControls?.show()
     },
 
+    /**
+     * Pauses the game and shows pause menu
+     * @param {HTMLElement} $menu - Menu element
+     */
     pause($menu: HTMLElement) {
         if (!this.world) {
             return
@@ -189,6 +211,10 @@ const game = {
         this.showScreen($menu, 'pause')
     },
 
+    /**
+     * Resumes the game from pause
+     * @param {HTMLElement} $menu - Menu element
+     */
     resume($menu: HTMLElement) {
         if (!this.world) {
             return
@@ -201,14 +227,27 @@ const game = {
         this.mobileControls?.show()
     },
 
+    /**
+     * Shows the menu overlay
+     * @param {HTMLElement} $menu - Menu element
+     */
     showMenu($menu: HTMLElement) {
         $menu.classList.add('is-visible')
     },
 
+    /**
+     * Hides the menu overlay
+     * @param {HTMLElement} $menu - Menu element
+     */
     hideMenu($menu: HTMLElement) {
         $menu.classList.remove('is-visible')
     },
 
+    /**
+     * Shows a specific menu screen
+     * @param {HTMLElement} $menu - Menu element
+     * @param {Screen} screen - Screen to show
+     */
     showScreen($menu: HTMLElement, screen: Screen) {
         const screens = Array.from($menu.querySelectorAll<HTMLElement>('[data-screen]'))
         
@@ -220,6 +259,11 @@ const game = {
         next?.classList.add('is-active')
     },
 
+    /**
+     * Gets the currently active menu screen
+     * @param {HTMLElement} $menu - Menu element
+     * @returns {Screen} Active screen name
+     */
     getActiveScreen($menu: HTMLElement): Screen {
         const active = $menu.querySelector<HTMLElement>('[data-screen].is-active')
         

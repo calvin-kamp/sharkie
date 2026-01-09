@@ -42,15 +42,26 @@ export class Projectile extends MovableObject {
         }
     }
 
+    /**
+     * Updates projectile position and lifetime
+     * @param {number} dtMs - Delta time in milliseconds
+     */
     update(dtMs: number) {
         this.x += this.vx * (dtMs / 16.67)
         this.aliveForMs += dtMs
     }
 
+    /**
+     * Forces projectile to expire immediately
+     */
     expire() {
         this.aliveForMs = this.ttlMs
     }
 
+    /**
+     * Checks if projectile has exceeded its lifetime
+     * @returns {boolean} True if projectile should be removed
+     */
     get isExpired() {
         return this.aliveForMs >= this.ttlMs
     }
