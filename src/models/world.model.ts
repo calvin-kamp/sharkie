@@ -32,7 +32,6 @@ type LevelLike = {
     backgrounds: MovableObject[]
     enemies: Enemy[]
     boss: Boss
-    private onFinish?: () => void
 
     statusBars?: StatusBar[]
     hudCounters?: HudCounter[]
@@ -49,6 +48,7 @@ export class World {
     backgrounds: MovableObject[]
     enemies: Enemy[]
     boss: Boss
+    private onFinish?: () => void
 
     readonly canvasWidth: number
     readonly canvasHeight: number
