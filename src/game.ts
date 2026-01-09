@@ -9,6 +9,8 @@ import '@styles/styles.scss'
 import { World } from '@models/world.model'
 import { createLevel, type Difficulty } from '@root/levels/level'
 import { MobileControls } from '@root/utils/mobile-controls'
+import { SoundManager } from '@root/utils/sound-manager'
+import { audioAssets, iconAssets } from '@root/utils/assets'
 
 /** CSS selector for the canvas element */
 const component = '*[data-component=canvas]'
@@ -35,6 +37,7 @@ const game = {
     lastNonPauseScreen: 'main' as Screen,
     lastDifficulty: null as Difficulty | null,
     mobileControls: null as MobileControls | null,
+    soundManager: null as SoundManager | null,
 
     /**
      * Initializes the game by setting up canvas, menu, and event bindings
@@ -43,9 +46,18 @@ const game = {
         const $canvas = document.querySelector<HTMLCanvasElement>(component)
         const $menu = document.querySelector<HTMLElement>('[data-menu]')
         const $mobile = document.querySelector<HTMLElement>('[data-mobile-controls]')
+        const $soundBtn = document.querySelector<HTMLElement>('[data-action="toggle-sound"]')
 
         if (!$canvas || !$menu) {
             return
+        }
+
+        // Initialize sound manager
+        this.soundManager = new SoundManager(audioAssets.backgroundMusic())
+
+        // Set initial sound button state
+        if ($soundBtn) {
+            this.updateSoundButton($soundBtn)
         }
 
         if ($mobile) {
@@ -65,7 +77,8 @@ const game = {
      * @param {HTMLElement} $menu - Menu element
      */
     bindMenu($canvas: HTMLCanvasElement, $menu: HTMLElement) {
-        $menu.addEventListener('click', (e) => {
+        // Handle all data-action buttons in the document
+        document.addEventListener('click', (e) => {
             const target = e.target as HTMLElement | null
             const btn = target?.closest<HTMLElement>('[data-action]')
             
@@ -136,7 +149,15 @@ const game = {
                 this.destroyWorld()
                 this.showMenu($menu)
                 this.showScreen($menu, 'main')
+                this.hideSoundButton()
                 this.mobileControls?.hide()
+            
+                return
+            }
+
+            if (action === 'toggle-sound') {
+                this.soundManager?.toggle()
+                this.updateSoundButton(btn)
             
                 return
             }
@@ -192,6 +213,8 @@ const game = {
 
         this.isPaused = false
         this.hideMenu($menu)
+        this.showSoundButton()
+        this.soundManager?.play()
 
         this.mobileControls?.show()
     },
@@ -226,6 +249,8 @@ const game = {
         this.isPaused = false
         this.world.setPaused(false)
         this.hideMenu($menu)
+        this.showSoundButton()
+        this.soundManager?.play()
 
         this.mobileControls?.show()
     },
@@ -238,12 +263,14 @@ const game = {
         this.world.destroy()
         this.world = null
         this.isPaused = false
+        this.soundManager?.pause()
     },
 
     finishToMainMenu($menu: HTMLElement) {
         this.destroyWorld()
         this.showMenu($menu)
         this.showScreen($menu, 'main')
+        this.hideSoundButton()
         this.mobileControls?.hide()
     },
 
@@ -288,6 +315,42 @@ const game = {
         const active = $menu.querySelector<HTMLElement>('[data-screen].is-active')
         
         return (active?.dataset.screen as Screen | undefined) ?? 'main'
+    },
+
+    /**
+     * Updates sound button icon based on current sound state
+     * @param {HTMLElement} btn - The sound toggle button
+     * @private
+     */
+    updateSoundButton(btn: HTMLElement): void {
+        const img = btn.querySelector<HTMLImageElement>('img')
+        if (!img) return
+
+        const isEnabled = this.soundManager?.isAudioEnabled() ?? true
+        img.src = isEnabled ? iconAssets.audioOn() : iconAssets.audioOff()
+        img.alt = isEnabled ? 'Sound on' : 'Sound off'
+    },
+
+    /**
+     * Shows the sound toggle button
+     * @private
+     */
+    showSoundButton(): void {
+        const $soundBtn = document.querySelector<HTMLElement>('[data-action="toggle-sound"]')
+        if ($soundBtn) {
+            $soundBtn.style.display = 'flex'
+        }
+    },
+
+    /**
+     * Hides the sound toggle button
+     * @private
+     */
+    hideSoundButton(): void {
+        const $soundBtn = document.querySelector<HTMLElement>('[data-action="toggle-sound"]')
+        if ($soundBtn) {
+            $soundBtn.style.display = 'none'
+        }
     },
 }
 
