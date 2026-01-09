@@ -63,6 +63,8 @@ export class Player extends MovableObject {
     private leftKeyPressed = false
     private topKeyPressed = false
     private bottomKeyPressed = false
+    
+    private movementEnabled = true
 
     private state: PlayerState = 'swim'
     private hurtVariant: HurtVariant = 'electric-shock'
@@ -256,6 +258,20 @@ export class Player extends MovableObject {
         this.setState('swim')
         this.addEventTriggers()
         this.startMovement()
+    }
+
+    /**
+     * Enables player movement
+     */
+    enableMovement() {
+        this.movementEnabled = true
+    }
+
+    /**
+     * Disables player movement
+     */
+    disableMovement() {
+        this.movementEnabled = false
     }
 
     /**
@@ -650,7 +666,7 @@ export class Player extends MovableObject {
      * @private
      */
     private onMoveTick() {
-        if (!this.world || this.world.isPaused || (this.world.isFrozen && this.state !== 'dead') || this.state === 'attack' || this.state === 'hurt' || this.state === 'dead' || this.isDead) {
+        if (!this.world || !this.movementEnabled || this.world.isPaused || (this.world.isFrozen && this.state !== 'dead') || this.state === 'attack' || this.state === 'hurt' || this.state === 'dead' || this.isDead) {
             return
         }
 
