@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Level creation and configuration module.
+ * Contains factory functions and configuration for creating game levels with appropriate
+ * enemies, collectibles, and difficulty-based stats.
+ */
+
 import { Level, type Difficulty } from '@models/level.model'
 import { Enemy } from '@models/enemy.model'
 import { Boss } from '@models/boss.model'
@@ -122,22 +128,17 @@ export const createLevel = (difficulty: Difficulty = 'medium') => {
         ...LEVEL_COLLECTIBLES.poisons.map((p) => createPoison(p.x, p.y)),
     ]
 
-    // Add more collectibles spread across the map
     const extraCoins = Array.from({ length: 12 }, (_, i) => ({ x: 350 + i * 190, y: 200 + (i % 4) * 60 }))
     const extraPoisons = Array.from({ length: 6 }, (_, i) => ({ x: 700 + i * 280, y: 350 + (i % 2) * 50 }))
     collectibles.push(...extraCoins.map((p) => createCoin(p.x, p.y)))
     collectibles.push(...extraPoisons.map((p) => createPoison(p.x, p.y)))
 
-    // Helper to generate spaced enemies
     const spawnSpaced = (type: 'jellyfish' | 'pufferfish', count: number, hp: number, dmg: number, startX: number, gap: number) =>
         Array.from({ length: count }, (_, i) => new Enemy({ x: startX + i * gap }, type, { maxHp: hp, damage: dmg }))
 
     const enemies = [
-        // Regular jellyfish, more count, spaced out
         ...spawnSpaced('jellyfish', 4, stats.jellyfishHp, stats.jellyfishDmg, 300, 260),
-        // Pufferfish, more count, spaced out
         ...spawnSpaced('pufferfish', 6, stats.pufferfishHp, stats.pufferfishDmg, 800, 240),
-        // Super jellyfish
         ...spawnSpaced('jellyfish', 3, stats.jellyfishSuperHp, stats.jellyfishSuperDmg, 1600, 260),
     ]
 

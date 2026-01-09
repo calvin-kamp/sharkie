@@ -1,9 +1,34 @@
+/**
+ * @fileoverview Status bar UI component for displaying health bars.
+ * Manages animated health bar rendering with sprite sheet frames.
+ */
+
 import { DrawableObject } from '@models/drawable-object.model'
 import { assets } from '@root/utils/assets'
 
+/**
+ * Types of status bars
+ * @typedef {'life'} StatusBarType
+ */
 export type StatusBarType = 'life'
+
+/**
+ * Color schemes for status bars
+ * @typedef {'purple' | 'green' | 'orange'} StatusBarColor
+ */
 export type StatusBarColor = 'purple' | 'green' | 'orange'
 
+/**
+ * Configuration for status bar
+ * @typedef {Object} StatusBarConfig
+ * @property {StatusBarType} type - The type of status bar
+ * @property {StatusBarColor} [color='purple'] - Color scheme for the bar
+ * @property {number} x - X position on canvas
+ * @property {number} y - Y position on canvas
+ * @property {number} [width=200] - Width of the status bar
+ * @property {number} [value] - Current value (defaults to maxValue)
+ * @property {number} maxValue - Maximum value for the bar
+ */
 type StatusBarConfig = {
     type: StatusBarType
     color?: StatusBarColor
@@ -14,6 +39,9 @@ type StatusBarConfig = {
     maxValue: number
 }
 
+/**
+ * Status bar UI component for displaying health bars with animations
+ */
 export class StatusBar extends DrawableObject {
     readonly type: StatusBarType
     readonly color: StatusBarColor

@@ -1,7 +1,26 @@
+/**
+ * @fileoverview Mobile touch control system for touch device input.
+ * Converts touch pointer events on mobile control buttons to keyboard events
+ * for game input compatibility across platforms.
+ */
+
+/**
+ * Mobile control key types
+ * @typedef {'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight' | 'q' | 'e'} MobileKey
+ */
 type MobileKey = 'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight' | 'q' | 'e'
 
+/**
+ * Keyboard event metadata
+ * @typedef {Object} KeyMeta
+ * @property {string} key - Keyboard key name
+ * @property {string} code - Keyboard code identifier
+ */
 type KeyMeta = { key: string; code: string }
 
+/**
+ * Mapping of mobile keys to keyboard metadata
+ */
 const KEY_META: Record<MobileKey, KeyMeta> = {
     ArrowUp: { key: 'ArrowUp', code: 'ArrowUp' },
     ArrowDown: { key: 'ArrowDown', code: 'ArrowDown' },
@@ -11,6 +30,10 @@ const KEY_META: Record<MobileKey, KeyMeta> = {
     e: { key: 'e', code: 'KeyE' },
 }
 
+/**
+ * Detects if the device has touch-like capabilities
+ * @returns {boolean} True if device has touch capabilities
+ */
 const isTouchLike = () => {
     if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
         if (window.matchMedia('(hover: none) and (pointer: coarse)').matches) {
@@ -20,6 +43,9 @@ const isTouchLike = () => {
     return (navigator.maxTouchPoints ?? 0) > 0
 }
 
+/**
+ * Mobile controls manager converting touch input to keyboard events
+ */
 export class MobileControls {
     private root: HTMLElement
     private enabled = false
@@ -104,7 +130,7 @@ export class MobileControls {
         try {
             if (typeof (e as PointerEvent).pointerId === 'number') btn.releasePointerCapture((e as PointerEvent).pointerId)
         } catch {
-            // ignore
+    
         }
 
         if (this.activePointerByKey.has(key)) {

@@ -1,6 +1,19 @@
+/**
+ * @fileoverview Projectile factory for creating player attack projectiles.
+ * Provides factory functions for bubble projectiles with damage calculation.
+ */
+
 import { Projectile, type ProjectileConfig } from '@models/projectile.model'
 import { assets } from '@root/utils/assets'
 
+/**
+ * Projectile spawn configuration
+ * @typedef {Object} ProjectileSpawn
+ * @property {number} x - Spawn X position
+ * @property {number} y - Spawn Y position
+ * @property {boolean} [poisoned] - Whether the projectile is poisoned
+ * @property {boolean} [directionLeft] - Direction override (left if true, right if false)
+ */
 export type ProjectileSpawn = {
     x: number
     y: number
@@ -8,6 +21,12 @@ export type ProjectileSpawn = {
     directionLeft?: boolean
 }
 
+/**
+ * Creates a bubble projectile with specified properties
+ * @param {ProjectileSpawn} spawn - Projectile spawn configuration
+ * @param {boolean} playerDirectionLeft - Default player direction
+ * @returns {Projectile} The created projectile
+ */
 export const createBubbleProjectile = (spawn: ProjectileSpawn, playerDirectionLeft: boolean): Projectile => {
     const poisoned = !!spawn.poisoned
     const directionLeft = typeof spawn.directionLeft === 'boolean' ? spawn.directionLeft : playerDirectionLeft

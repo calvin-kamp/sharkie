@@ -1,7 +1,15 @@
+/**
+ * @fileoverview Player HUD management for displaying player status bars and counters.
+ * Aggregates and renders all player UI components on canvas.
+ */
+
 import type { StatusBar } from '@models/status-bar.model'
 import type { HudCounter } from '@models/hud-counter.model'
 import type { Player } from '@models/player.model'
 
+/**
+ * Player HUD manager displaying health bars and resource counters
+ */
 export class PlayerHud {
     private readonly statusBars: StatusBar[]
     private readonly hudCounters: HudCounter[]

@@ -1,5 +1,13 @@
+/**
+ * @fileoverview Camera system for viewport management and following player.
+ * Handles camera offset calculation and view boundary tracking.
+ */
+
 import { clamp } from '@root/utils/geometry'
 
+/**
+ * Camera class managing the game viewport and offset for following the player
+ */
 export class Camera {
     offset = 0
 

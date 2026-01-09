@@ -1,11 +1,22 @@
+/**
+ * @fileoverview Main game initialization and menu management module.
+ * Handles game initialization, menu UI interactions, game lifecycle (pause/resume/start),
+ * and screen navigation.
+ */
+
 import '@styles/styles.scss'
 
 import { World } from '@models/world.model'
 import { createLevel, type Difficulty } from '@root/levels/level'
 import { MobileControls } from '@root/utils/mobile-controls'
 
+/** CSS selector for the canvas element */
 const component = '*[data-component=canvas]'
 
+/**
+ * Available menu screens in the game UI
+ * @typedef {'main' | 'difficulty' | 'pause' | 'controls' | 'description' | 'enemies' | 'items'} Screen
+ */
 type Screen =
     | 'main'
     | 'difficulty'
@@ -15,6 +26,9 @@ type Screen =
     | 'enemies'
     | 'items'
 
+/**
+ * Main game object managing game state and UI interactions
+ */
 const game = {
     world: null as World | null,
     isPaused: false,

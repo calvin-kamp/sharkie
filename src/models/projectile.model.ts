@@ -1,5 +1,18 @@
+/**
+ * @fileoverview Projectile model for player attack projectiles (bubbles).
+ * Manages projectile movement, lifetime, and damage properties.
+ */
+
 import { MovableObject, type HitboxConfig, type MovableObjectConfig } from '@models/movable-object.model'
 
+/**
+ * Configuration for creating projectiles
+ * @typedef {Object} ProjectileConfig
+ * @property {number} vx - Horizontal velocity
+ * @property {number} damage - Damage dealt on hit
+ * @property {number} ttlMs - Time to live in milliseconds
+ * @property {HitboxConfig} [hitbox] - Collision hitbox configuration
+ */
 export interface ProjectileConfig extends MovableObjectConfig {
     vx: number
     damage: number
@@ -7,6 +20,10 @@ export interface ProjectileConfig extends MovableObjectConfig {
     hitbox?: HitboxConfig
 }
 
+/**
+ * Projectile class for player attack projectiles
+ * Handles movement, lifetime tracking, and damage properties
+ */
 export class Projectile extends MovableObject {
     vx: number
     damage: number

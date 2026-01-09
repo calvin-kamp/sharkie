@@ -1,7 +1,27 @@
+/**
+ * @fileoverview HUD counter component for displaying resource counts.
+ * Manages animated counters for coins and poison bottles in the player HUD.
+ */
+
 import { DrawableObject, type DrawableObjectConfig } from '@models/drawable-object.model'
 
+/**
+ * Types of HUD counters
+ * @typedef {'poison' | 'coin'} HudCounterType
+ */
 export type HudCounterType = 'poison' | 'coin'
 
+/**
+ * Configuration for creating HUD counter
+ * @typedef {Object} HudCounterConfig
+ * @property {HudCounterType} type - Type of counter
+ * @property {number} x - X position on canvas
+ * @property {number} y - Y position on canvas
+ * @property {number} [width=42] - Width of the counter icon
+ * @property {number} [value=0] - Current counter value
+ * @property {string[]} frames - Animation frame images
+ * @property {number} [fps=10] - Animation frames per second
+ */
 export type HudCounterConfig = {
     type: HudCounterType
     x: number
@@ -12,6 +32,9 @@ export type HudCounterConfig = {
     fps?: number
 }
 
+/**
+ * HUD counter component for displaying resource counts with animation
+ */
 export class HudCounter extends DrawableObject {
     readonly type: HudCounterType
     value: number

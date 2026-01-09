@@ -1,8 +1,29 @@
+/**
+ * @fileoverview Boss enemy model for the final boss encounter.
+ * Manages boss behavior, attack patterns, animations, and combat mechanics.
+ */
+
 import { MovableObject, type MovableObjectConfig, type HitboxConfig } from '@models/movable-object.model'
 import type { CombatConfig } from '@models/combat.model'
 import type { Player } from '@models/player.model'
 import { clamp } from '@root/utils/geometry'
 
+/**
+ * Configuration for creating the boss
+ * @typedef {Object} BossConfig
+ * @property {string[]} imagesIntroduce - Introduction animation frames
+ * @property {string[]} imagesFloating - Idle floating animation frames
+ * @property {string[]} imagesAttack - Attack animation frames
+ * @property {string[]} imagesDead - Death animation frames
+ * @property {string[]} imagesHurt - Hurt animation frames
+ * @property {number} [x] - X position on canvas
+ * @property {number} [y] - Y position on canvas
+ * @property {number} [width] - Width in pixels
+ * @property {number} [height] - Height in pixels
+ * @property {number} [aspectRatio] - Width to height ratio
+ * @property {HitboxConfig} [hitbox] - Collision hitbox configuration
+ * @property {CombatConfig} [combat] - Combat stats configuration
+ */
 export interface BossConfig {
     imagesIntroduce: string[]
     imagesFloating: string[]
@@ -20,6 +41,9 @@ export interface BossConfig {
     combat?: CombatConfig
 }
 
+/**
+ * Boss class representing the final boss enemy with complex AI and attack patterns
+ */
 export class Boss extends MovableObject {
     private introduced = false
     private introducing = false
@@ -90,7 +114,6 @@ export class Boss extends MovableObject {
         this.framesHurt = config.imagesHurt
 
         this.setFrames(this.framesFloating, this.ANIM_FPS.floating)
-        // Set boss hitbox once (constant)
         {
             const w = this.width
             const h = this.calculatedHeight
@@ -244,7 +267,6 @@ export class Boss extends MovableObject {
         this.introduced = true
         this.introducing = true
 
-        // If movement is disabled for hitbox testing, skip animation entirely
         if (this.movementDisabledForHitboxTesting) {
             this.introducing = false
             this.setFrames(this.framesFloating, this.ANIM_FPS.floating)
@@ -310,7 +332,6 @@ export class Boss extends MovableObject {
     }
 
     alignForIntro(player: Player, viewRight: number, worldLeft: number, worldRight: number, canvasHeight: number, spawnGap: number) {
-        // If movement is disabled for hitbox testing, center boss on screen
         if (this.movementDisabledForHitboxTesting) {
             const canvasWidth = viewRight - worldLeft
             this.x = worldLeft + (canvasWidth - this.width) / 2
@@ -319,10 +340,8 @@ export class Boss extends MovableObject {
             return
         }
 
-        // Position boss with 20% off-screen to the right (80% visible)
         this.x = viewRight - this.width * 0.8
         
-        // Position boss vertically centered relative to player
         const playerCenterY = player.y + player.calculatedHeight / 2
         const bossCenterY = this.calculatedHeight / 2
         this.y = Math.max(0, Math.min(playerCenterY - bossCenterY, canvasHeight - this.calculatedHeight))

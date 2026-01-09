@@ -1,9 +1,27 @@
+/**
+ * @fileoverview Collectible items model for coins and poison powerups.
+ * Manages pickup items that grant player resources like coins and poison bottles.
+ */
+
 import { DrawableObject, type DrawableObjectConfig } from '@models/drawable-object.model'
 import type { HitboxConfig } from '@models/movable-object.model'
 import type { Player } from '@models/player.model'
 
+/**
+ * Types of collectible items
+ * @typedef {'coin' | 'poison'} CollectibleType
+ */
 export type CollectibleType = 'coin' | 'poison'
 
+/**
+ * Configuration for creating collectible items
+ * @typedef {Object} CollectibleConfig
+ * @property {CollectibleType} type - The type of collectible
+ * @property {number} [value=1] - The value of the collectible
+ * @property {HitboxConfig} [hitbox] - Collision hitbox configuration
+ * @property {string[]} [frames] - Animation frame images
+ * @property {number} [fps=10] - Animation frames per second
+ */
 export type CollectibleConfig = DrawableObjectConfig & {
     type: CollectibleType
     value?: number
@@ -14,6 +32,10 @@ export type CollectibleConfig = DrawableObjectConfig & {
     fps?: number
 }
 
+/**
+ * Collectible item class for coins and poison powerups
+ * Handles animation, collision detection, and collection logic
+ */
 export class Collectible extends DrawableObject {
     readonly type: CollectibleType
     readonly value: number
